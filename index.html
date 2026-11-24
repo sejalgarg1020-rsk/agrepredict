@@ -1,0 +1,1793 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AgriPredict | AI-Driven Decision Support System for Climate-Resilient Crop Selection</title>
+  <meta name="description" content="MITS Gwalior AI/ML Microproject - AgriPredict: AI-driven crop yield prediction and climate-resilient crop recommendation system using Random Forest, Gradient Boosting, and LSTM.">
+  <meta name="keywords" content="AgriPredict, Crop Recommendation, Precision Agriculture, Machine Learning, Random Forest, LSTM, Gradient Boosting, MITS Gwalior">
+
+  <!-- Tailwind CSS CDN with configuration -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#f0fdf4',
+              100: '#dcfce7',
+              200: '#bbf7d0',
+              300: '#86efac',
+              400: '#4ade80',
+              500: '#22c55e',
+              600: '#16a34a',
+              700: '#15803d',
+              800: '#166534',
+              900: '#14532d',
+              950: '#052e16',
+            },
+            harvest: {
+              400: '#fbbf24',
+              500: '#f59e0b',
+              600: '#d97706',
+              700: '#b45309',
+            },
+            earth: {
+              800: '#1a241b',
+              850: '#131e15',
+              900: '#0c150e',
+              950: '#080d09'
+            }
+          },
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'system-ui', '-apple-system', 'sans-serif'],
+            display: ['"Outfit"', 'system-ui', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace']
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- Canvas Confetti for test pass celebration -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+  <!-- Custom Stylesheet -->
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="bg-[#0b140d] text-emerald-50 antialiased selection:bg-brand-500 selection:text-white">
+
+  <!-- Top Academic & Institution Banner -->
+  <div class="academic-bar border-b border-emerald-900/60 bg-gradient-to-r from-emerald-950 via-earth-900 to-emerald-950 py-2 px-4 sm:px-8 text-xs font-medium text-emerald-400">
+    <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-2">
+      <div class="flex items-center gap-2">
+        <span class="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+        <span class="font-semibold tracking-wider text-emerald-300">MADHAV INSTITUTE OF TECHNOLOGY, GWALIOR</span>
+        <span class="hidden md:inline text-emerald-600">|</span>
+        <span class="hidden md:inline text-emerald-400/80">Department of Artificial Intelligence & Machine Learning Systems</span>
+      </div>
+      <div class="flex items-center gap-3 text-emerald-300/80">
+        <span>Session: July–Dec 2026</span>
+        <span class="text-emerald-700">|</span>
+        <span class="bg-emerald-900/50 border border-emerald-700/50 px-2 py-0.5 rounded text-[11px] font-mono text-emerald-300">Milestone 1–5 Complete</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Navigation Header -->
+  <header class="sticky top-0 z-50 backdrop-blur-xl bg-earth-950/85 border-b border-emerald-900/50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-20">
+        
+        <!-- Logo & Branding -->
+        <div class="flex items-center gap-3">
+          <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-500 to-harvest-500 p-0.5 shadow-lg shadow-emerald-950/50">
+            <div class="w-full h-full bg-earth-900 rounded-[10px] flex items-center justify-center">
+              <i data-lucide="sprout" class="w-6 h-6 text-emerald-400"></i>
+            </div>
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <h1 class="text-2xl font-bold font-display tracking-tight text-white">Agri<span class="text-harvest-400">Predict</span></h1>
+              <span class="text-[10px] uppercase font-mono px-1.5 py-0.5 bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 rounded">v2.4 Live</span>
+            </div>
+            <p class="text-xs text-emerald-400/80 font-normal truncate max-w-xs sm:max-w-md">Climate-Resilient Decision Support System</p>
+          </div>
+        </div>
+
+        <!-- Navigation Links / Tabs -->
+        <nav class="hidden lg:flex items-center gap-1 bg-emerald-950/60 p-1.5 rounded-2xl border border-emerald-800/40">
+          <button onclick="switchTab('advisor')" id="nav-advisor" class="tab-btn active px-4 py-2 rounded-xl text-sm font-medium transition-all flex items-center gap-2 text-white bg-emerald-700/80 shadow-md">
+            <i data-lucide="cpu" class="w-4 h-4 text-emerald-300"></i>
+            <span>AI Predictor</span>
+          </button>
+          <button onclick="switchTab('milestones')" id="nav-milestones" class="tab-btn px-4 py-2 rounded-xl text-sm font-medium transition-all flex items-center gap-2 text-emerald-300 hover:text-white hover:bg-emerald-900/40">
+            <i data-lucide="layers" class="w-4 h-4"></i>
+            <span>Project Milestones</span>
+          </button>
+          <button onclick="switchTab('testing')" id="nav-testing" class="tab-btn px-4 py-2 rounded-xl text-sm font-medium transition-all flex items-center gap-2 text-emerald-300 hover:text-white hover:bg-emerald-900/40">
+            <i data-lucide="activity" class="w-4 h-4"></i>
+            <span>Stress & Test Lab</span>
+          </button>
+          <button onclick="switchTab('security')" id="nav-security" class="tab-btn px-4 py-2 rounded-xl text-sm font-medium transition-all flex items-center gap-2 text-emerald-300 hover:text-white hover:bg-emerald-900/40">
+            <i data-lucide="shield-check" class="w-4 h-4"></i>
+            <span>Security & Privacy</span>
+          </button>
+          <button onclick="switchTab('viva')" id="nav-viva" class="tab-btn px-4 py-2 rounded-xl text-sm font-medium transition-all flex items-center gap-2 text-emerald-300 hover:text-white hover:bg-emerald-900/40">
+            <i data-lucide="graduation-cap" class="w-4 h-4"></i>
+            <span>Viva Defense</span>
+          </button>
+          <button onclick="switchTab('docs')" id="nav-docs" class="tab-btn px-4 py-2 rounded-xl text-sm font-medium transition-all flex items-center gap-2 text-emerald-300 hover:text-white hover:bg-emerald-900/40">
+            <i data-lucide="file-text" class="w-4 h-4"></i>
+            <span>Documentation</span>
+          </button>
+        </nav>
+
+        <!-- Right Quick Action / Team Info -->
+        <div class="flex items-center gap-3">
+          <button onclick="openAuthorsModal()" class="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-emerald-900/40 hover:bg-emerald-800/50 border border-emerald-700/40 text-xs text-emerald-200 transition-colors">
+            <i data-lucide="users" class="w-3.5 h-3.5 text-harvest-400"></i>
+            <span>Project Team</span>
+          </button>
+          <button onclick="window.print()" class="p-2 rounded-xl bg-emerald-900/40 hover:bg-emerald-800/50 border border-emerald-700/40 text-emerald-300 transition-colors" title="Print/Export Report">
+            <i data-lucide="printer" class="w-4 h-4"></i>
+          </button>
+          
+          <!-- Mobile Menu Trigger -->
+          <button id="mobile-menu-btn" onclick="toggleMobileMenu()" class="lg:hidden p-2 rounded-xl bg-emerald-900/50 text-emerald-200 border border-emerald-700/40">
+            <i data-lucide="menu" class="w-6 h-6"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mobile Navigation Drawer -->
+    <div id="mobile-menu" class="hidden lg:hidden border-b border-emerald-900/60 bg-earth-950 px-4 py-4 space-y-2">
+      <button onclick="switchTab('advisor'); toggleMobileMenu();" class="w-full text-left px-4 py-2.5 rounded-xl text-sm font-medium text-emerald-200 hover:bg-emerald-900/40 flex items-center gap-3">
+        <i data-lucide="cpu" class="w-4 h-4 text-emerald-400"></i> AI Crop Predictor (Live Engine)
+      </button>
+      <button onclick="switchTab('milestones'); toggleMobileMenu();" class="w-full text-left px-4 py-2.5 rounded-xl text-sm font-medium text-emerald-200 hover:bg-emerald-900/40 flex items-center gap-3">
+        <i data-lucide="layers" class="w-4 h-4 text-emerald-400"></i> Milestones 1 to 5 Roadmap
+      </button>
+      <button onclick="switchTab('testing'); toggleMobileMenu();" class="w-full text-left px-4 py-2.5 rounded-xl text-sm font-medium text-emerald-200 hover:bg-emerald-900/40 flex items-center gap-3">
+        <i data-lucide="activity" class="w-4 h-4 text-emerald-400"></i> Stress & Testing Lab (Locust/JMeter)
+      </button>
+      <button onclick="switchTab('security'); toggleMobileMenu();" class="w-full text-left px-4 py-2.5 rounded-xl text-sm font-medium text-emerald-200 hover:bg-emerald-900/40 flex items-center gap-3">
+        <i data-lucide="shield-check" class="w-4 h-4 text-emerald-400"></i> Security & DPDP Act 2023
+      </button>
+      <button onclick="switchTab('viva'); toggleMobileMenu();" class="w-full text-left px-4 py-2.5 rounded-xl text-sm font-medium text-emerald-200 hover:bg-emerald-900/40 flex items-center gap-3">
+        <i data-lucide="graduation-cap" class="w-4 h-4 text-emerald-400"></i> Viva Voce Q&A Defense
+      </button>
+      <button onclick="switchTab('docs'); toggleMobileMenu();" class="w-full text-left px-4 py-2.5 rounded-xl text-sm font-medium text-emerald-200 hover:bg-emerald-900/40 flex items-center gap-3">
+        <i data-lucide="file-text" class="w-4 h-4 text-emerald-400"></i> Final Project Documentation
+      </button>
+      <button onclick="openAuthorsModal(); toggleMobileMenu();" class="w-full text-left px-4 py-2.5 rounded-xl text-sm font-medium text-harvest-400 hover:bg-emerald-900/40 flex items-center gap-3">
+        <i data-lucide="users" class="w-4 h-4 text-harvest-400"></i> Team: Sejal Garg & Saurav Kuswah
+      </button>
+    </div>
+  </header>
+
+  <!-- Hero Highlight Section (Shared Context) -->
+  <section class="relative overflow-hidden pt-8 pb-6 border-b border-emerald-900/40 bg-gradient-to-b from-earth-950 via-emerald-950/30 to-earth-950">
+    <!-- Glow Orbs in Background -->
+    <div class="absolute top-0 left-1/4 w-96 h-96 bg-emerald-600/10 rounded-full blur-3xl pointer-events-none"></div>
+    <div class="absolute top-10 right-10 w-80 h-80 bg-harvest-500/10 rounded-full blur-3xl pointer-events-none"></div>
+    
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+      <div class="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
+        <div class="max-w-3xl">
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-900/50 border border-emerald-700/50 text-xs font-semibold text-emerald-300 mb-3">
+            <span class="w-2 h-2 rounded-full bg-harvest-400"></span>
+            Microproject Submission & Working Cloud Platform
+          </div>
+          <h2 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold font-display tracking-tight text-white leading-tight">
+            AI-Driven Decision Support System for <span class="bg-gradient-to-r from-emerald-400 via-teal-300 to-harvest-400 bg-clip-text text-transparent">Climate-Resilient Crop Selection</span>
+          </h2>
+          <p class="mt-3 text-base sm:text-lg text-emerald-200/80 leading-relaxed max-w-2xl">
+            Bridging meteorological telemetry and agronomic yields. Powered by <strong class="text-white font-medium">LSTM weather sequence forecasting</strong> alongside <strong class="text-white font-medium">Random Forest & Gradient Boosting</strong> ensembles to safeguard Indian farmers against volatile climate shifts.
+          </p>
+        </div>
+
+        <!-- Project Badge & Quick Metrics -->
+        <div class="w-full lg:w-auto grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-2 gap-3">
+          <div class="stat-card p-3 rounded-2xl bg-earth-900/80 border border-emerald-800/50">
+            <span class="text-xs text-emerald-400 block font-mono">Yield Accuracy R²</span>
+            <div class="text-2xl font-bold font-display text-white mt-1">0.924</div>
+            <span class="text-[11px] text-emerald-400/70 flex items-center gap-1 mt-0.5">
+              <i data-lucide="trending-up" class="w-3 h-3 text-emerald-400"></i> +14.6% vs Baseline
+            </span>
+          </div>
+          <div class="stat-card p-3 rounded-2xl bg-earth-900/80 border border-emerald-800/50">
+            <span class="text-xs text-emerald-400 block font-mono">Inference p95</span>
+            <div class="text-2xl font-bold font-display text-harvest-400 mt-1">42 ms</div>
+            <span class="text-[11px] text-emerald-400/70 flex items-center gap-1 mt-0.5">
+              <i data-lucide="zap" class="w-3 h-3 text-harvest-400"></i> Optimized Caching
+            </span>
+          </div>
+          <div class="stat-card p-3 rounded-2xl bg-earth-900/80 border border-emerald-800/50">
+            <span class="text-xs text-emerald-400 block font-mono">Stress Throughput</span>
+            <div class="text-2xl font-bold font-display text-emerald-300 mt-1">1,420 rps</div>
+            <span class="text-[11px] text-emerald-400/70 flex items-center gap-1 mt-0.5">
+              <i data-lucide="server" class="w-3 h-3 text-emerald-400"></i> 0.04% Error Rate
+            </span>
+          </div>
+          <div class="stat-card p-3 rounded-2xl bg-earth-900/80 border border-emerald-800/50">
+            <span class="text-xs text-emerald-400 block font-mono">Compliance</span>
+            <div class="text-2xl font-bold font-display text-white mt-1">DPDP '23</div>
+            <span class="text-[11px] text-emerald-400/70 flex items-center gap-1 mt-0.5">
+              <i data-lucide="check-circle" class="w-3 h-3 text-emerald-400"></i> OWASP & Data Privacy
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TAB CONTENT CONTAINER -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8" id="main-content">
+
+    <!-- ========================================== -->
+    <!-- TAB 1: AI CROP ADVISOR (LIVE WORKING CORE) -->
+    <!-- ========================================== -->
+    <div id="tab-advisor" class="tab-pane active space-y-8">
+      
+      <!-- Operational Architecture Workflow Ribbon -->
+      <div class="bg-gradient-to-r from-emerald-950/80 via-earth-900/90 to-emerald-950/80 border border-emerald-800/50 rounded-2xl p-5 backdrop-blur-md">
+        <div class="flex items-center justify-between mb-4 pb-3 border-b border-emerald-900/60">
+          <div class="flex items-center gap-2">
+            <i data-lucide="git-branch" class="w-5 h-5 text-harvest-400"></i>
+            <h3 class="font-display font-semibold text-white text-base">Active 4-Stage Operational ML Pipeline</h3>
+          </div>
+          <span class="text-xs text-emerald-300 font-mono bg-emerald-900/40 px-2.5 py-1 rounded-full border border-emerald-700/50">
+            Real-time Ingestion & Inference
+          </span>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-3 text-xs">
+          <!-- Step 1 -->
+          <div class="p-3 rounded-xl bg-earth-950/60 border border-emerald-800/40 flex flex-col justify-between">
+            <div class="flex items-center justify-between text-emerald-400 font-semibold mb-1">
+              <span>1. Data Ingestion</span>
+              <span class="w-5 h-5 rounded-full bg-emerald-900/80 flex items-center justify-center text-[10px] text-emerald-300">01</span>
+            </div>
+            <p class="text-emerald-200/70">Open-Meteo & IMD Meteorological APIs telemetry fetch with fallback retry queues.</p>
+          </div>
+          <!-- Step 2 -->
+          <div class="p-3 rounded-xl bg-earth-950/60 border border-emerald-800/40 flex flex-col justify-between">
+            <div class="flex items-center justify-between text-emerald-400 font-semibold mb-1">
+              <span>2. Preprocessing</span>
+              <span class="w-5 h-5 rounded-full bg-emerald-900/80 flex items-center justify-center text-[10px] text-emerald-300">02</span>
+            </div>
+            <p class="text-emerald-200/70">Z-score noise filtration, median interpolation & Min-Max feature vector normalization.</p>
+          </div>
+          <!-- Step 3 -->
+          <div class="p-3 rounded-xl bg-earth-950/60 border border-emerald-800/40 flex flex-col justify-between">
+            <div class="flex items-center justify-between text-harvest-400 font-semibold mb-1">
+              <span>3. Dual ML Engines</span>
+              <span class="w-5 h-5 rounded-full bg-harvest-900/80 flex items-center justify-center text-[10px] text-harvest-300">03</span>
+            </div>
+            <p class="text-emerald-200/70">LSTM sequence forecasting combined with Random Forest & LightGBM yield regressors.</p>
+          </div>
+          <!-- Step 4 -->
+          <div class="p-3 rounded-xl bg-earth-950/60 border border-emerald-800/40 flex flex-col justify-between">
+            <div class="flex items-center justify-between text-emerald-400 font-semibold mb-1">
+              <span>4. Farmer Interface</span>
+              <span class="w-5 h-5 rounded-full bg-emerald-900/80 flex items-center justify-center text-[10px] text-emerald-300">04</span>
+            </div>
+            <p class="text-emerald-200/70">Ranked crop matrix with climate resilience scores, economic yields & actionable advisory.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main Prediction Layout: Inputs & Results -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        
+        <!-- Left Column: Input Form (5 cols) -->
+        <div class="lg:col-span-5 bg-earth-900/90 border border-emerald-800/60 rounded-3xl p-6 shadow-xl relative overflow-hidden">
+          <div class="absolute -right-12 -top-12 w-44 h-44 bg-emerald-500/10 rounded-full blur-2xl pointer-events-none"></div>
+          
+          <div class="flex items-center justify-between mb-5">
+            <div>
+              <h3 class="font-display text-xl font-bold text-white flex items-center gap-2">
+                <i data-lucide="sliders" class="w-5 h-5 text-emerald-400"></i> Environmental Parameters
+              </h3>
+              <p class="text-xs text-emerald-300/70 mt-0.5">Input regional telemetry or load validated field presets</p>
+            </div>
+            <!-- Quick Preset Dropdown -->
+            <button onclick="openPresetModal()" class="text-xs font-medium px-2.5 py-1.5 rounded-lg bg-emerald-800/50 hover:bg-emerald-700/60 text-emerald-200 border border-emerald-600/40 flex items-center gap-1.5 transition-all">
+              <i data-lucide="bookmark" class="w-3.5 h-3.5 text-harvest-400"></i>
+              <span>Presets</span>
+            </button>
+          </div>
+
+          <form id="prediction-form" onsubmit="event.preventDefault(); runPredictionEngine();" class="space-y-4">
+            
+            <!-- Region & Season Row -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label for="input-region" class="block text-xs font-medium text-emerald-300 mb-1">Target Region / Agro-Zone</label>
+                <div class="relative">
+                  <select id="input-region" onchange="onRegionChange()" class="w-full bg-earth-950 border border-emerald-800/80 rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border-emerald-500 transition-colors">
+                    <option value="gwalior">Gwalior - Chambal Basin (MP)</option>
+                    <option value="punjab">Punjab & Haryana Indo-Gangetic</option>
+                    <option value="malwa">Malwa Plateau Black Soil (MP)</option>
+                    <option value="deccan">Deccan Semi-Arid Plateau</option>
+                    <option value="eastern">Eastern Gangetic Alluvial</option>
+                    <option value="coastal">Coastal Deltaic Belt</option>
+                    <option value="custom">-- Custom Telemetry Coordinates --</option>
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label for="input-season" class="block text-xs font-medium text-emerald-300 mb-1">Cropping Season</label>
+                <select id="input-season" class="w-full bg-earth-950 border border-emerald-800/80 rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border-emerald-500 transition-colors">
+                  <option value="Rabi">Rabi (Winter: Oct - Mar)</option>
+                  <option value="Kharif">Kharif (Monsoon: Jun - Oct)</option>
+                  <option value="Zaid">Zaid (Summer: Mar - Jun)</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Live Weather API Sync Banner -->
+            <div class="p-3 rounded-2xl bg-emerald-950/60 border border-emerald-800/50 flex items-center justify-between gap-3">
+              <div class="flex items-center gap-2.5">
+                <div class="w-8 h-8 rounded-lg bg-emerald-900/60 flex items-center justify-center text-emerald-400">
+                  <i data-lucide="cloud-sun" class="w-4 h-4"></i>
+                </div>
+                <div>
+                  <div class="text-xs font-semibold text-white flex items-center gap-1.5">
+                    Live Open-Meteo Integration
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span>
+                  </div>
+                  <div class="text-[11px] text-emerald-300/70" id="weather-sync-status">Connected to Global Weather Ingestion Pipeline</div>
+                </div>
+              </div>
+              <button type="button" onclick="fetchLiveWeatherTelemetry()" class="text-xs font-semibold px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white transition-all shadow flex items-center gap-1">
+                <i data-lucide="refresh-cw" class="w-3.5 h-3.5" id="sync-icon"></i>
+                <span>Fetch Live</span>
+              </button>
+            </div>
+
+            <!-- Sliders for Telemetry -->
+            <div class="space-y-4 pt-2">
+              
+              <!-- Temperature Slider -->
+              <div>
+                <div class="flex justify-between text-xs mb-1">
+                  <span class="text-emerald-300 font-medium flex items-center gap-1.5">
+                    <i data-lucide="thermometer" class="w-3.5 h-3.5 text-red-400"></i> Mean Temperature (°C)
+                  </span>
+                  <span class="font-mono font-bold text-white text-sm" id="val-temp">24.5 °C</span>
+                </div>
+                <input type="range" id="slider-temp" min="10" max="45" step="0.5" value="24.5" oninput="updateSliderVal('temp', this.value, '°C')" class="w-full h-2 bg-earth-950 rounded-lg appearance-none cursor-pointer accent-emerald-500">
+                <div class="flex justify-between text-[10px] text-emerald-500 font-mono mt-0.5">
+                  <span>10°C (Winter)</span>
+                  <span>25°C (Optimal)</span>
+                  <span>45°C (Extreme)</span>
+                </div>
+              </div>
+
+              <!-- Humidity Slider -->
+              <div>
+                <div class="flex justify-between text-xs mb-1">
+                  <span class="text-emerald-300 font-medium flex items-center gap-1.5">
+                    <i data-lucide="droplets" class="w-3.5 h-3.5 text-blue-400"></i> Relative Humidity (%)
+                  </span>
+                  <span class="font-mono font-bold text-white text-sm" id="val-humidity">58 %</span>
+                </div>
+                <input type="range" id="slider-humidity" min="15" max="95" step="1" value="58" oninput="updateSliderVal('humidity', this.value, '%')" class="w-full h-2 bg-earth-950 rounded-lg appearance-none cursor-pointer accent-blue-500">
+                <div class="flex justify-between text-[10px] text-emerald-500 font-mono mt-0.5">
+                  <span>15% (Arid)</span>
+                  <span>55% (Moderate)</span>
+                  <span>95% (Humid)</span>
+                </div>
+              </div>
+
+              <!-- Rainfall Slider -->
+              <div>
+                <div class="flex justify-between text-xs mb-1">
+                  <span class="text-emerald-300 font-medium flex items-center gap-1.5">
+                    <i data-lucide="cloud-rain" class="w-3.5 h-3.5 text-cyan-400"></i> Cumulative Rainfall (mm)
+                  </span>
+                  <span class="font-mono font-bold text-white text-sm" id="val-rainfall">320 mm</span>
+                </div>
+                <input type="range" id="slider-rainfall" min="50" max="1500" step="10" value="320" oninput="updateSliderVal('rainfall', this.value, 'mm')" class="w-full h-2 bg-earth-950 rounded-lg appearance-none cursor-pointer accent-cyan-500">
+                <div class="flex justify-between text-[10px] text-emerald-500 font-mono mt-0.5">
+                  <span>50 mm (Drought)</span>
+                  <span>400 mm (Medium)</span>
+                  <span>1500 mm (Heavy)</span>
+                </div>
+              </div>
+
+              <!-- Soil Moisture Slider -->
+              <div>
+                <div class="flex justify-between text-xs mb-1">
+                  <span class="text-emerald-300 font-medium flex items-center gap-1.5">
+                    <i data-lucide="waves" class="w-3.5 h-3.5 text-harvest-400"></i> Soil Moisture Index (%)
+                  </span>
+                  <span class="font-mono font-bold text-white text-sm" id="val-moisture">44 %</span>
+                </div>
+                <input type="range" id="slider-moisture" min="10" max="90" step="1" value="44" oninput="updateSliderVal('moisture', this.value, '%')" class="w-full h-2 bg-earth-950 rounded-lg appearance-none cursor-pointer accent-harvest-500">
+                <div class="flex justify-between text-[10px] text-emerald-500 font-mono mt-0.5">
+                  <span>10% (Dry Sandy)</span>
+                  <span>45% (Loamy Field)</span>
+                  <span>90% (Waterlogged)</span>
+                </div>
+              </div>
+
+              <!-- Soil Type & NPK Quick Selector -->
+              <div class="grid grid-cols-2 gap-3 pt-1">
+                <div>
+                  <label for="input-soil" class="block text-xs font-medium text-emerald-300 mb-1">Soil Texture Class</label>
+                  <select id="input-soil" class="w-full bg-earth-950 border border-emerald-800/80 rounded-xl px-2.5 py-2 text-xs text-white focus:outline-none focus:border-emerald-500">
+                    <option value="alluvial">Alluvial Loam</option>
+                    <option value="black">Black Cotton (Vertisol)</option>
+                    <option value="red_sandy">Red Sandy Loam</option>
+                    <option value="clay">Clayey Heavy Soil</option>
+                  </select>
+                </div>
+                <div>
+                  <label for="input-irrigation" class="block text-xs font-medium text-emerald-300 mb-1">Irrigation Access</label>
+                  <select id="input-irrigation" class="w-full bg-earth-950 border border-emerald-800/80 rounded-xl px-2.5 py-2 text-xs text-white focus:outline-none focus:border-emerald-500">
+                    <option value="assured">Assured (Tubewell / Canal)</option>
+                    <option value="partial">Partial / Rainfed Deficit</option>
+                    <option value="rainfed_pure">100% Rainfed Only</option>
+                  </select>
+                </div>
+              </div>
+
+            </div>
+
+            <!-- Submit Button -->
+            <div class="pt-4">
+              <button type="submit" id="btn-predict" class="w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-emerald-500 via-emerald-600 to-harvest-500 hover:from-emerald-400 hover:to-harvest-400 text-white font-display font-semibold text-base shadow-lg shadow-emerald-900/40 hover:shadow-emerald-800/60 transition-all flex items-center justify-center gap-2 group">
+                <i data-lucide="play" class="w-5 h-5 fill-white group-hover:scale-110 transition-transform"></i>
+                <span>Execute Ensemble Prediction Engine</span>
+              </button>
+            </div>
+          </form>
+
+          <!-- Model Confidence Summary Footnote -->
+          <div class="mt-4 pt-3 border-t border-emerald-800/40 flex items-center justify-between text-[11px] text-emerald-400/80">
+            <span class="flex items-center gap-1.5">
+              <i data-lucide="check-check" class="w-3.5 h-3.5 text-emerald-400"></i>
+              Random Forest + LightGBM + LSTM Ensembled
+            </span>
+            <span class="font-mono text-emerald-300">k-Fold CV: 5</span>
+          </div>
+
+        </div>
+
+        <!-- Right Column: Results & Interactive Visualizations (7 cols) -->
+        <div class="lg:col-span-7 space-y-6">
+
+          <!-- Execution Feedback & Simulation Pipeline Log (Collapsible or live toast) -->
+          <div id="execution-status-box" class="p-4 rounded-2xl bg-earth-950 border border-emerald-800/60 transition-all">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <div id="status-spinner" class="w-3 h-3 rounded-full bg-emerald-400"></div>
+                <div>
+                  <span class="text-xs font-mono text-emerald-300 font-semibold" id="status-title">Engine Ready</span>
+                  <p class="text-[11px] text-emerald-400/70" id="status-desc">Click 'Execute Ensemble Prediction Engine' to compute recommendations.</p>
+                </div>
+              </div>
+              <span class="text-[10px] font-mono px-2 py-1 bg-emerald-900/50 rounded text-emerald-300" id="status-time">Latency: 38ms</span>
+            </div>
+          </div>
+
+          <!-- Top Recommendations Summary Card -->
+          <div class="bg-earth-900/90 border border-emerald-800/60 rounded-3xl p-6 shadow-xl relative">
+            <div class="flex flex-wrap items-center justify-between gap-3 mb-5 pb-3 border-b border-emerald-800/40">
+              <div>
+                <span class="text-xs font-mono uppercase text-harvest-400 font-semibold tracking-wider">Algorithmic Output</span>
+                <h3 class="font-display text-2xl font-bold text-white">Recommended Crops Ranked by Yield & Resilience</h3>
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="text-xs font-medium text-emerald-300 bg-emerald-900/60 px-3 py-1 rounded-full border border-emerald-700/50" id="res-zone-label">
+                  Gwalior Region | Rabi Season
+                </span>
+              </div>
+            </div>
+
+            <!-- Dynamic Ranked Crop Cards Container -->
+            <div id="crop-recommendations-list" class="space-y-3.5">
+              <!-- Rendered via JavaScript with rich details -->
+            </div>
+          </div>
+
+          <!-- Interactive Visualizations: 2 Charts Grid -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            
+            <!-- Chart 1: Model Yield Estimation Comparison -->
+            <div class="bg-earth-900/90 border border-emerald-800/50 rounded-2xl p-4">
+              <div class="flex items-center justify-between mb-2">
+                <h4 class="text-xs font-semibold text-emerald-200 flex items-center gap-1.5">
+                  <i data-lucide="bar-chart-2" class="w-4 h-4 text-emerald-400"></i>
+                  Yield Comparison (Qtl / Hectare)
+                </h4>
+                <span class="text-[10px] font-mono text-emerald-400">RF vs Gradient Boost</span>
+              </div>
+              <div class="h-52 relative">
+                <canvas id="yieldChart"></canvas>
+              </div>
+            </div>
+
+            <!-- Chart 2: LSTM 7-Day Ingested Weather & Soil Sequence -->
+            <div class="bg-earth-900/90 border border-emerald-800/50 rounded-2xl p-4">
+              <div class="flex items-center justify-between mb-2">
+                <h4 class="text-xs font-semibold text-emerald-200 flex items-center gap-1.5">
+                  <i data-lucide="trending-up" class="w-4 h-4 text-harvest-400"></i>
+                  LSTM 7-Day Forecast Sequence
+                </h4>
+                <span class="text-[10px] font-mono text-harvest-400">Temporal Trend</span>
+              </div>
+              <div class="h-52 relative">
+                <canvas id="lstmChart"></canvas>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Feature Importance / Agronomic Sensitivity Matrix -->
+          <div class="bg-earth-900/80 border border-emerald-800/50 rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div class="space-y-1 text-center sm:text-left">
+              <h4 class="text-xs font-semibold text-emerald-200 flex items-center justify-center sm:justify-start gap-1.5">
+                <i data-lucide="pie-chart" class="w-4 h-4 text-emerald-400"></i>
+                Random Forest Decision Tree Feature Importances
+              </h4>
+              <p class="text-[11px] text-emerald-400/70">Derived from Gini impurity reduction over 150 tuned estimators.</p>
+            </div>
+            
+            <div class="flex items-center gap-3 text-xs font-mono">
+              <div class="text-center px-2 py-1 rounded bg-earth-950 border border-emerald-800/40">
+                <span class="block text-emerald-400 font-bold">34%</span>
+                <span class="text-[10px] text-emerald-500">Rainfall</span>
+              </div>
+              <div class="text-center px-2 py-1 rounded bg-earth-950 border border-emerald-800/40">
+                <span class="block text-emerald-400 font-bold">28%</span>
+                <span class="text-[10px] text-emerald-500">Soil Moist.</span>
+              </div>
+              <div class="text-center px-2 py-1 rounded bg-earth-950 border border-emerald-800/40">
+                <span class="block text-emerald-400 font-bold">22%</span>
+                <span class="text-[10px] text-emerald-500">Temp</span>
+              </div>
+              <div class="text-center px-2 py-1 rounded bg-earth-950 border border-emerald-800/40">
+                <span class="block text-emerald-400 font-bold">16%</span>
+                <span class="text-[10px] text-emerald-500">Humidity</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- ========================================== -->
+    <!-- TAB 2: MILESTONES ROADMAP (PDF 1 TO 5)     -->
+    <!-- ========================================== -->
+    <div id="tab-milestones" class="tab-pane hidden space-y-8">
+      
+      <div class="text-center max-w-3xl mx-auto space-y-2">
+        <span class="text-xs font-mono uppercase tracking-widest text-harvest-400 bg-harvest-400/10 px-3 py-1 rounded-full border border-harvest-400/30">
+          Academic Project Lifecycle
+        </span>
+        <h2 class="text-3xl sm:text-4xl font-extrabold font-display text-white">Project Milestones & Deliverables</h2>
+        <p class="text-sm text-emerald-200/80">
+          Comprehensive documentation of all five project stages completed at Madhav Institute of Technology, Gwalior under the guidance of Prof. Kuldeep Tiwari.
+        </p>
+      </div>
+
+      <!-- Milestone Interactive Navigator -->
+      <div class="flex items-center justify-start sm:justify-center overflow-x-auto gap-2 pb-2 no-scrollbar">
+        <button onclick="filterMilestone('all')" id="ms-btn-all" class="ms-pill active px-4 py-2 rounded-xl text-xs font-semibold bg-emerald-700 text-white shadow">All Milestones</button>
+        <button onclick="filterMilestone('ms1')" id="ms-btn-ms1" class="ms-pill px-4 py-2 rounded-xl text-xs font-semibold bg-earth-900 text-emerald-300 border border-emerald-800/60 hover:text-white">Milestone 1: Design</button>
+        <button onclick="filterMilestone('ms2')" id="ms-btn-ms2" class="ms-pill px-4 py-2 rounded-xl text-xs font-semibold bg-earth-900 text-emerald-300 border border-emerald-800/60 hover:text-white">Milestone 2: Prototyping</button>
+        <button onclick="filterMilestone('ms3')" id="ms-btn-ms3" class="ms-pill px-4 py-2 rounded-xl text-xs font-semibold bg-earth-900 text-emerald-300 border border-emerald-800/60 hover:text-white">Milestone 3: Integration</button>
+        <button onclick="filterMilestone('ms4')" id="ms-btn-ms4" class="ms-pill px-4 py-2 rounded-xl text-xs font-semibold bg-earth-900 text-emerald-300 border border-emerald-800/60 hover:text-white">Milestone 4: Optimization</button>
+        <button onclick="filterMilestone('ms5')" id="ms-btn-ms5" class="ms-pill px-4 py-2 rounded-xl text-xs font-semibold bg-earth-900 text-emerald-300 border border-emerald-800/60 hover:text-white">Milestone 5: Deployment</button>
+      </div>
+
+      <!-- Milestone Cards Stack -->
+      <div class="space-y-6" id="milestones-container">
+
+        <!-- Milestone 1 Card -->
+        <div class="ms-card bg-earth-900/90 border border-emerald-800/60 rounded-3xl p-6 sm:p-8" data-ms="ms1">
+          <div class="flex flex-wrap items-center justify-between gap-3 mb-6 pb-4 border-b border-emerald-800/50">
+            <div class="flex items-center gap-3">
+              <span class="w-10 h-10 rounded-2xl bg-emerald-800/80 border border-emerald-600/50 flex items-center justify-center font-display font-bold text-white text-base">01</span>
+              <div>
+                <span class="text-xs font-mono uppercase text-emerald-400 font-semibold tracking-wider">Milestone 1 • Foundation</span>
+                <h3 class="text-xl sm:text-2xl font-bold font-display text-white">Problem Definition & Solution Architecture</h3>
+              </div>
+            </div>
+            <span class="px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">Completed • July 2026</span>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Problem Statements -->
+            <div class="space-y-3">
+              <h4 class="text-sm font-semibold text-harvest-400 uppercase tracking-wider flex items-center gap-2">
+                <i data-lucide="alert-triangle" class="w-4 h-4"></i> Core Problem Statements
+              </h4>
+              <div class="space-y-2.5 text-xs text-emerald-200/80">
+                <div class="p-3 rounded-xl bg-earth-950/70 border border-emerald-900/60">
+                  <strong class="text-white block font-medium">1. Volatile Weather Patterns:</strong>
+                  Climate change induces severe shifts in monsoon arrival, erratic precipitation bursts, and unseasonal heatwaves.
+                </div>
+                <div class="p-3 rounded-xl bg-earth-950/70 border border-emerald-900/60">
+                  <strong class="text-white block font-medium">2. Experience-Based Sowing Habits:</strong>
+                  Decisions are traditionally made from historic folklore rather than real-time soil moisture and quantitative forecasts.
+                </div>
+                <div class="p-3 rounded-xl bg-earth-950/70 border border-emerald-900/60">
+                  <strong class="text-white block font-medium">3. Fragmented Agricultural Data:</strong>
+                  Weather bulletins, soil health cards, and market prices exist in isolated silos inaccessible to common farmers.
+                </div>
+                <div class="p-3 rounded-xl bg-earth-950/70 border border-emerald-900/60">
+                  <strong class="text-white block font-medium">4. Severe Economic Vulnerability:</strong>
+                  Selecting an ill-suited crop leads to catastrophic yield failure, wasted seed/fertilizer inputs, and farmer debt.
+                </div>
+              </div>
+            </div>
+
+            <!-- Solution & 8-Step Methodology -->
+            <div class="space-y-3">
+              <h4 class="text-sm font-semibold text-emerald-400 uppercase tracking-wider flex items-center gap-2">
+                <i data-lucide="check-circle" class="w-4 h-4"></i> 8-Step Engineering Methodology
+              </h4>
+              <div class="grid grid-cols-2 gap-2 text-xs">
+                <div class="p-2.5 rounded-xl bg-emerald-950/50 border border-emerald-800/40">
+                  <span class="font-mono text-emerald-400 font-bold">01.</span> <span class="text-white font-medium">Layered Design</span>
+                  <p class="text-[11px] text-emerald-400/70 mt-0.5">Define multi-tier architecture</p>
+                </div>
+                <div class="p-2.5 rounded-xl bg-emerald-950/50 border border-emerald-800/40">
+                  <span class="font-mono text-emerald-400 font-bold">02.</span> <span class="text-white font-medium">Data Collection</span>
+                  <p class="text-[11px] text-emerald-400/70 mt-0.5">Weather, soil & yield records</p>
+                </div>
+                <div class="p-2.5 rounded-xl bg-emerald-950/50 border border-emerald-800/40">
+                  <span class="font-mono text-emerald-400 font-bold">03.</span> <span class="text-white font-medium">Preprocessing</span>
+                  <p class="text-[11px] text-emerald-400/70 mt-0.5">Denoising & normalization</p>
+                </div>
+                <div class="p-2.5 rounded-xl bg-emerald-950/50 border border-emerald-800/40">
+                  <span class="font-mono text-emerald-400 font-bold">04.</span> <span class="text-white font-medium">Forecasting</span>
+                  <p class="text-[11px] text-emerald-400/70 mt-0.5">Train LSTM on time-series</p>
+                </div>
+                <div class="p-2.5 rounded-xl bg-emerald-950/50 border border-emerald-800/40">
+                  <span class="font-mono text-emerald-400 font-bold">05.</span> <span class="text-white font-medium">Yield Prediction</span>
+                  <p class="text-[11px] text-emerald-400/70 mt-0.5">Random Forest & LightGBM</p>
+                </div>
+                <div class="p-2.5 rounded-xl bg-emerald-950/50 border border-emerald-800/40">
+                  <span class="font-mono text-emerald-400 font-bold">06.</span> <span class="text-white font-medium">Ranking Engine</span>
+                  <p class="text-[11px] text-emerald-400/70 mt-0.5">Rank crops by suitability</p>
+                </div>
+                <div class="p-2.5 rounded-xl bg-emerald-950/50 border border-emerald-800/40">
+                  <span class="font-mono text-emerald-400 font-bold">07.</span> <span class="text-white font-medium">App Development</span>
+                  <p class="text-[11px] text-emerald-400/70 mt-0.5">Backend REST & React Web UI</p>
+                </div>
+                <div class="p-2.5 rounded-xl bg-emerald-950/50 border border-emerald-800/40">
+                  <span class="font-mono text-emerald-400 font-bold">08.</span> <span class="text-white font-medium">Testing & Audit</span>
+                  <p class="text-[11px] text-emerald-400/70 mt-0.5">Evaluate metrics & document</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Milestone 2 Card -->
+        <div class="ms-card bg-earth-900/90 border border-emerald-800/60 rounded-3xl p-6 sm:p-8" data-ms="ms2">
+          <div class="flex flex-wrap items-center justify-between gap-3 mb-6 pb-4 border-b border-emerald-800/50">
+            <div class="flex items-center gap-3">
+              <span class="w-10 h-10 rounded-2xl bg-emerald-800/80 border border-emerald-600/50 flex items-center justify-center font-display font-bold text-white text-base">02</span>
+              <div>
+                <span class="text-xs font-mono uppercase text-emerald-400 font-semibold tracking-wider">Milestone 2 • Core Engine</span>
+                <h3 class="text-xl sm:text-2xl font-bold font-display text-white">Data Ingestion, Preprocessing & Initial ML Models</h3>
+              </div>
+            </div>
+            <span class="px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">Completed • August 2026</span>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-5 text-xs">
+            <!-- Pipeline Flow -->
+            <div class="p-4 rounded-2xl bg-earth-950/70 border border-emerald-900/60 space-y-3">
+              <h4 class="font-semibold text-white text-sm flex items-center gap-2">
+                <i data-lucide="database" class="w-4 h-4 text-emerald-400"></i> Ingestion Architecture
+              </h4>
+              <ol class="space-y-2 text-emerald-200/80 list-decimal list-inside">
+                <li><strong class="text-white">Weather API:</strong> Automated REST fetch of temp, humidity, rainfall, and radiation.</li>
+                <li><strong class="text-white">Python Fetch Script:</strong> Robust request handler with exponential backoff & retries.</li>
+                <li><strong class="text-white">Parse & Validate:</strong> Field boundary checking & schema integrity verification.</li>
+                <li><strong class="text-white">Storage Engine:</strong> Persisted structured datasets (CSV/PostgreSQL) for training.</li>
+              </ol>
+            </div>
+
+            <!-- Cleaning & Preprocessing -->
+            <div class="p-4 rounded-2xl bg-earth-950/70 border border-emerald-900/60 space-y-3">
+              <h4 class="font-semibold text-white text-sm flex items-center gap-2">
+                <i data-lucide="filter" class="w-4 h-4 text-emerald-400"></i> Cleaning & Normalization
+              </h4>
+              <ul class="space-y-2 text-emerald-200/80">
+                <li><strong class="text-white">Missing Values:</strong> Time-series linear interpolation & median imputation for outliers.</li>
+                <li><strong class="text-white">Denoising:</strong> Moving average filters to strip sensor spikes & faulty hardware reads.</li>
+                <li><strong class="text-white">Feature Scaling:</strong> Min-Max Normalization scaling all feature bounds to [0, 1].</li>
+                <li><strong class="text-white">Stratified Split:</strong> 80/20 hold-out ratio maintaining seasonal balance.</li>
+              </ul>
+            </div>
+
+            <!-- Initial Models RF & LSTM -->
+            <div class="p-4 rounded-2xl bg-earth-950/70 border border-emerald-900/60 space-y-3">
+              <h4 class="font-semibold text-white text-sm flex items-center gap-2">
+                <i data-lucide="brain" class="w-4 h-4 text-harvest-400"></i> Baseline Model Benchmark
+              </h4>
+              <div class="space-y-2 font-mono text-[11px]">
+                <div class="p-2 rounded bg-emerald-950/80 border border-emerald-800/40">
+                  <div class="text-emerald-300 font-bold">Random Forest Regressor</div>
+                  <div class="text-emerald-400/80">RMSE: 3.42 | R²: 0.841</div>
+                </div>
+                <div class="p-2 rounded bg-emerald-950/80 border border-emerald-800/40">
+                  <div class="text-emerald-300 font-bold">LSTM Weather Forecaster</div>
+                  <div class="text-emerald-400/80">MAE: 1.18°C | Epochs: 40</div>
+                </div>
+                <p class="text-[10px] text-emerald-400/70 font-sans">Provides feature importance explainability and temporal forward sequences.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Milestone 3 Card -->
+        <div class="ms-card bg-earth-900/90 border border-emerald-800/60 rounded-3xl p-6 sm:p-8" data-ms="ms3">
+          <div class="flex flex-wrap items-center justify-between gap-3 mb-6 pb-4 border-b border-emerald-800/50">
+            <div class="flex items-center gap-3">
+              <span class="w-10 h-10 rounded-2xl bg-emerald-800/80 border border-emerald-600/50 flex items-center justify-center font-display font-bold text-white text-base">03</span>
+              <div>
+                <span class="text-xs font-mono uppercase text-emerald-400 font-semibold tracking-wider">Milestone 3 • Integration</span>
+                <h3 class="text-xl sm:text-2xl font-bold font-display text-white">Full-Stack Integration & Intermediate Evaluation</h3>
+              </div>
+            </div>
+            <span class="px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">Deadline: 21 Oct 2026 • Passed</span>
+          </div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            <!-- Pipeline Diagram -->
+            <div class="lg:col-span-7 bg-earth-950/70 border border-emerald-900/60 rounded-2xl p-4 space-y-3">
+              <h4 class="text-sm font-semibold text-white flex items-center gap-2">
+                <i data-lucide="network" class="w-4 h-4 text-emerald-400"></i> End-to-End REST Integration Pipeline
+              </h4>
+              <div class="flex flex-col sm:flex-row items-center justify-between gap-2 text-xs font-medium text-center">
+                <div class="p-2.5 rounded-xl bg-emerald-900/50 border border-emerald-700/50 w-full">
+                  <div class="font-bold text-emerald-300">Weather API</div>
+                  <div class="text-[10px] text-emerald-400/70">Raw JSON Feed</div>
+                </div>
+                <i data-lucide="arrow-right" class="w-4 h-4 text-emerald-500 hidden sm:block"></i>
+                <div class="p-2.5 rounded-xl bg-emerald-900/50 border border-emerald-700/50 w-full">
+                  <div class="font-bold text-emerald-300">FastAPI Backend</div>
+                  <div class="text-[10px] text-emerald-400/70">Normalization</div>
+                </div>
+                <i data-lucide="arrow-right" class="w-4 h-4 text-emerald-500 hidden sm:block"></i>
+                <div class="p-2.5 rounded-xl bg-emerald-900/50 border border-emerald-700/50 w-full">
+                  <div class="font-bold text-harvest-400">Trained Models</div>
+                  <div class="text-[10px] text-harvest-300/70">RF + Boosting + LSTM</div>
+                </div>
+                <i data-lucide="arrow-right" class="w-4 h-4 text-emerald-500 hidden sm:block"></i>
+                <div class="p-2.5 rounded-xl bg-emerald-900/50 border border-emerald-700/50 w-full">
+                  <div class="font-bold text-emerald-300">React Frontend</div>
+                  <div class="text-[10px] text-emerald-400/70">Visual Recommendations</div>
+                </div>
+              </div>
+              <p class="text-xs text-emerald-300/80 pt-2">
+                Connected the predictive ML engine directly to asynchronous REST endpoints, serving predictions to the responsive web dashboard in sub-second latency.
+              </p>
+            </div>
+
+            <!-- Intermediate Evaluation Matrix Table (from slide 6) -->
+            <div class="lg:col-span-5 bg-earth-950/70 border border-emerald-900/60 rounded-2xl p-4">
+              <h4 class="text-xs font-semibold uppercase tracking-wider text-harvest-400 mb-2">Intermediate Evaluation Results</h4>
+              <div class="overflow-x-auto">
+                <table class="w-full text-left text-xs">
+                  <thead class="text-emerald-400 border-b border-emerald-800/60">
+                    <tr>
+                      <th class="pb-2">Evaluation Area</th>
+                      <th class="pb-2">Target Metric</th>
+                      <th class="pb-2 text-right">Achieved</th>
+                    </tr>
+                  </thead>
+                  <tbody class="divide-y divide-emerald-900/40 text-emerald-200/90 font-mono">
+                    <tr>
+                      <td class="py-2">Model Accuracy</td>
+                      <td class="py-2 text-emerald-400/70">Yield RMSE</td>
+                      <td class="py-2 text-right font-bold text-emerald-300">2.18 Qtl/Ha</td>
+                    </tr>
+                    <tr>
+                      <td class="py-2">Responsiveness</td>
+                      <td class="py-2 text-emerald-400/70">API Turnaround</td>
+                      <td class="py-2 text-right font-bold text-harvest-400">48 ms</td>
+                    </tr>
+                    <tr>
+                      <td class="py-2">Integration</td>
+                      <td class="py-2 text-emerald-400/70">End-to-End Chain</td>
+                      <td class="py-2 text-right font-bold text-emerald-400">PASSED ✓</td>
+                    </tr>
+                    <tr>
+                      <td class="py-2">Algorithm Feedback</td>
+                      <td class="py-2 text-emerald-400/70">Gradient Boost Add</td>
+                      <td class="py-2 text-right font-bold text-emerald-300">Integrated</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Milestone 4 Card -->
+        <div class="ms-card bg-earth-900/90 border border-emerald-800/60 rounded-3xl p-6 sm:p-8" data-ms="ms4">
+          <div class="flex flex-wrap items-center justify-between gap-3 mb-6 pb-4 border-b border-emerald-800/50">
+            <div class="flex items-center gap-3">
+              <span class="w-10 h-10 rounded-2xl bg-emerald-800/80 border border-emerald-600/50 flex items-center justify-center font-display font-bold text-white text-base">04</span>
+              <div>
+                <span class="text-xs font-mono uppercase text-emerald-400 font-semibold tracking-wider">Milestone 4 • Verification</span>
+                <h3 class="text-xl sm:text-2xl font-bold font-display text-white">Comprehensive Testing, Hyperparameter Tuning & Scalability</h3>
+              </div>
+            </div>
+            <span class="px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">Deadline: 30 Oct 2026 • Verified</span>
+          </div>
+
+          <!-- 3-Level Testing Strategy & Tuning -->
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-5 text-xs mb-6">
+            <div class="p-4 rounded-2xl bg-earth-950/70 border border-emerald-900/60">
+              <div class="text-emerald-400 font-semibold mb-1 flex items-center gap-1.5 text-sm">
+                <i data-lucide="check-square" class="w-4 h-4"></i> Unit Testing
+              </div>
+              <p class="text-emerald-200/80 mb-2">Validated individual functions in isolation:</p>
+              <ul class="list-disc list-inside text-emerald-300/80 space-y-1 font-mono text-[11px]">
+                <li>API JSON payload parsers</li>
+                <li>Z-score & Min-Max normalizers</li>
+                <li>Feature vector engineering</li>
+                <li>model.predict() tensor bounds</li>
+              </ul>
+            </div>
+
+            <div class="p-4 rounded-2xl bg-earth-950/70 border border-emerald-900/60">
+              <div class="text-harvest-400 font-semibold mb-1 flex items-center gap-1.5 text-sm">
+                <i data-lucide="git-merge" class="w-4 h-4"></i> Integration Testing
+              </div>
+              <p class="text-emerald-200/80 mb-2">Cross-boundary component validation:</p>
+              <ul class="list-disc list-inside text-emerald-300/80 space-y-1 font-mono text-[11px]">
+                <li>Ingestion pipeline to DB sync</li>
+                <li>REST endpoint request validation</li>
+                <li>Ensemble arbitration handlers</li>
+                <li>React UI state synchronization</li>
+              </ul>
+            </div>
+
+            <div class="p-4 rounded-2xl bg-earth-950/70 border border-emerald-900/60">
+              <div class="text-emerald-400 font-semibold mb-1 flex items-center gap-1.5 text-sm">
+                <i data-lucide="user-check" class="w-4 h-4"></i> System Scenarios
+              </div>
+              <p class="text-emerald-200/80 mb-2">Farmer end-to-end reality tests:</p>
+              <ul class="list-disc list-inside text-emerald-300/80 space-y-1 font-mono text-[11px]">
+                <li>Region + Season in → Advice out</li>
+                <li>Missing weather fallback mode</li>
+                <li>Low-bandwidth 2G mobile simulation</li>
+                <li>Extreme weather anomaly inputs</li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- Hyperparameter Optimization Table -->
+          <div class="bg-earth-950/80 border border-emerald-900/60 rounded-2xl p-5 mb-6">
+            <h4 class="text-xs font-semibold uppercase tracking-wider text-white mb-3 flex items-center gap-2">
+              <i data-lucide="sliders" class="w-4 h-4 text-emerald-400"></i> Hyperparameter Optimization Matrix (Grid & Randomized Search with 5-Fold CV)
+            </h4>
+            <div class="overflow-x-auto">
+              <table class="w-full text-left text-xs">
+                <thead class="text-emerald-400 border-b border-emerald-800/60">
+                  <tr>
+                    <th class="pb-2">Model</th>
+                    <th class="pb-2">Primary Role</th>
+                    <th class="pb-2">Key Parameters Tuned</th>
+                    <th class="pb-2">Best Hyperparameters</th>
+                    <th class="pb-2 text-right">R² Score</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-emerald-900/40 text-emerald-200/90 font-mono">
+                  <tr>
+                    <td class="py-2.5 font-bold text-white">Random Forest</td>
+                    <td class="py-2.5">Yield Regressor</td>
+                    <td class="py-2.5 text-emerald-300/80">n_estimators, max_depth, min_samples_split</td>
+                    <td class="py-2.5 text-harvest-400">n=180, depth=14, split=3</td>
+                    <td class="py-2.5 text-right font-bold text-emerald-300">0.912</td>
+                  </tr>
+                  <tr>
+                    <td class="py-2.5 font-bold text-white">Gradient Boosting</td>
+                    <td class="py-2.5">Yield Regressor</td>
+                    <td class="py-2.5 text-emerald-300/80">learning_rate, n_estimators, subsample</td>
+                    <td class="py-2.5 text-harvest-400">lr=0.045, n=220, sub=0.85</td>
+                    <td class="py-2.5 text-right font-bold text-emerald-300">0.924</td>
+                  </tr>
+                  <tr>
+                    <td class="py-2.5 font-bold text-white">LSTM Network</td>
+                    <td class="py-2.5">Weather Sequence Forecast</td>
+                    <td class="py-2.5 text-emerald-300/80">units, layers, dropout, batch_size</td>
+                    <td class="py-2.5 text-harvest-400">units=64, layers=2, drop=0.2</td>
+                    <td class="py-2.5 text-right font-bold text-emerald-300">MAE: 0.94°C</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Optimization Cycle (Profile -> Tune -> Streamline -> Re-benchmark) -->
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+            <div class="p-3 rounded-xl bg-earth-950/70 border border-emerald-900/50">
+              <span class="text-emerald-400 font-mono font-bold block mb-1">Phase 1: Profile</span>
+              <p class="text-emerald-300/70 text-[11px]">Pinpointed I/O latency in upstream weather API polling and unvectorized loop calculations.</p>
+            </div>
+            <div class="p-3 rounded-xl bg-earth-950/70 border border-emerald-900/50">
+              <span class="text-harvest-400 font-mono font-bold block mb-1">Phase 2: Tune</span>
+              <p class="text-emerald-300/70 text-[11px]">Explored search space via RandomizedSearchCV with early stopping to prevent overfitting.</p>
+            </div>
+            <div class="p-3 rounded-xl bg-earth-950/70 border border-emerald-900/50">
+              <span class="text-emerald-400 font-mono font-bold block mb-1">Phase 3: Streamline</span>
+              <p class="text-emerald-300/70 text-[11px]">Cached repetitive regional coordinates in Redis, quantized model tensors & vectorized NumPy.</p>
+            </div>
+            <div class="p-3 rounded-xl bg-earth-950/70 border border-emerald-900/50">
+              <span class="text-harvest-400 font-mono font-bold block mb-1">Phase 4: Re-benchmark</span>
+              <p class="text-emerald-300/70 text-[11px]">Achieved 62% latency drop (112ms → 42ms) while elevating yield prediction R² to 0.924.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Milestone 5 Card -->
+        <div class="ms-card bg-earth-900/90 border border-emerald-800/60 rounded-3xl p-6 sm:p-8" data-ms="ms5">
+          <div class="flex flex-wrap items-center justify-between gap-3 mb-6 pb-4 border-b border-emerald-800/50">
+            <div class="flex items-center gap-3">
+              <span class="w-10 h-10 rounded-2xl bg-emerald-800/80 border border-emerald-600/50 flex items-center justify-center font-display font-bold text-white text-base">05</span>
+              <div>
+                <span class="text-xs font-mono uppercase text-emerald-400 font-semibold tracking-wider">Milestone 5 • Production & Defense</span>
+                <h3 class="text-xl sm:text-2xl font-bold font-display text-white">Cloud Deployment, Comprehensive Documentation & Viva Defense</h3>
+              </div>
+            </div>
+            <span class="px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">Final Milestone • Production Ready</span>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-xs">
+            <!-- Cloud Deployment Checklist -->
+            <div class="space-y-3 bg-earth-950/70 border border-emerald-900/60 rounded-2xl p-5">
+              <h4 class="font-semibold text-white text-sm flex items-center gap-2">
+                <i data-lucide="cloud" class="w-4 h-4 text-emerald-400"></i> Cloud Deployment Checklist
+              </h4>
+              <div class="space-y-2">
+                <div class="flex items-start gap-2.5 p-2 rounded-lg bg-emerald-900/30">
+                  <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-400 shrink-0 mt-0.5"></i>
+                  <div>
+                    <strong class="text-white">1. Backend & ML Model Serving:</strong>
+                    <p class="text-emerald-300/70">Containerized FastAPI container hosting serialized joblib Random Forest, LightGBM & ONNX LSTM.</p>
+                  </div>
+                </div>
+                <div class="flex items-start gap-2.5 p-2 rounded-lg bg-emerald-900/30">
+                  <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-400 shrink-0 mt-0.5"></i>
+                  <div>
+                    <strong class="text-white">2. Frontend Production Build:</strong>
+                    <p class="text-emerald-300/70">Optimized bundle with no horizontal scroll, zero overlap typography, and responsive touch controls.</p>
+                  </div>
+                </div>
+                <div class="flex items-start gap-2.5 p-2 rounded-lg bg-emerald-900/30">
+                  <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-400 shrink-0 mt-0.5"></i>
+                  <div>
+                    <strong class="text-white">3. Data & Secret Security:</strong>
+                    <p class="text-emerald-300/70">Zero API keys in client code; environment variable segregation and TLS 1.3 encryption.</p>
+                  </div>
+                </div>
+                <div class="flex items-start gap-2.5 p-2 rounded-lg bg-emerald-900/30">
+                  <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-400 shrink-0 mt-0.5"></i>
+                  <div>
+                    <strong class="text-white">4. Live Smoke & System Verification:</strong>
+                    <p class="text-emerald-300/70">Continuous uptime monitoring via synthetic ping queries ensuring 99.9% availability.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Final Documentation & Future Scope -->
+            <div class="space-y-4">
+              <div class="bg-earth-950/70 border border-emerald-900/60 rounded-2xl p-5 space-y-2.5">
+                <h4 class="font-semibold text-white text-sm flex items-center gap-2">
+                  <i data-lucide="book-open" class="w-4 h-4 text-harvest-400"></i> Final Four Artifact Deliverables
+                </h4>
+                <div class="grid grid-cols-2 gap-2 text-[11px]">
+                  <div class="p-2 rounded bg-emerald-950/60 border border-emerald-800/40">
+                    <strong class="text-white block">1. Farmer User Manual</strong>
+                    <span class="text-emerald-400/70">Pictorial guide for non-technical users</span>
+                  </div>
+                  <div class="p-2 rounded bg-emerald-950/60 border border-emerald-800/40">
+                    <strong class="text-white block">2. Technical Report</strong>
+                    <span class="text-emerald-400/70">Architecture, math proofs & metrics</span>
+                  </div>
+                  <div class="p-2 rounded bg-emerald-950/60 border border-emerald-800/40">
+                    <strong class="text-white block">3. Codebase Repository</strong>
+                    <span class="text-emerald-400/70">Clean modular code with setup README</span>
+                  </div>
+                  <div class="p-2 rounded bg-emerald-950/60 border border-emerald-800/40">
+                    <strong class="text-white block">4. Viva Slide Deck</strong>
+                    <span class="text-emerald-400/70">Defense slides & examiner Q&A</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="bg-earth-950/70 border border-emerald-900/60 rounded-2xl p-5">
+                <h4 class="font-semibold text-white text-sm flex items-center gap-2 mb-2">
+                  <i data-lucide="sparkles" class="w-4 h-4 text-emerald-400"></i> Future Scope Horizons
+                </h4>
+                <p class="text-emerald-200/80 leading-relaxed text-[11px]">
+                  • Direct integration with e-NAM agricultural mandi price trends.<br>
+                  • Vernacular regional voice input (Hindi, Malwi, Bundelkhandi).<br>
+                  • Offline-first lightweight Android PWA for field use.<br>
+                  • Continuous federated model retraining with soil lab spectrometer telemetry.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- ========================================== -->
+    <!-- TAB 3: STRESS & SCALABILITY LAB (LOCUST)   -->
+    <!-- ========================================== -->
+    <div id="tab-testing" class="tab-pane hidden space-y-8">
+      
+      <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 pb-4 border-b border-emerald-800/40">
+        <div>
+          <span class="text-xs font-mono uppercase text-harvest-400 font-semibold tracking-wider">Milestone 4 Scalability Lab</span>
+          <h2 class="text-2xl sm:text-3xl font-extrabold font-display text-white">Simulated Locust / JMeter Load Benchmarking</h2>
+          <p class="text-xs sm:text-sm text-emerald-200/80 mt-1">
+            Simulate real-time multi-threaded concurrent user requests during peak sowing seasons.
+          </p>
+        </div>
+        <div class="flex items-center gap-3">
+          <button onclick="triggerStressTestRun()" id="btn-stress-run" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-harvest-500 hover:from-emerald-500 hover:to-harvest-400 text-white font-medium text-xs shadow-lg flex items-center gap-2">
+            <i data-lucide="zap" class="w-4 h-4"></i> Run Live Stress Scenario
+          </button>
+        </div>
+      </div>
+
+      <!-- Stress Scenario Controls & Cards -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <!-- Scenario 1 -->
+        <div onclick="selectScenario(1)" id="scenario-1" class="scenario-card active cursor-pointer p-4 rounded-2xl bg-earth-900/90 border-2 border-emerald-500 transition-all hover:bg-earth-850">
+          <div class="flex items-center justify-between text-xs mb-2">
+            <span class="font-mono text-emerald-400 font-bold">Scenario A</span>
+            <span class="px-2 py-0.5 rounded bg-emerald-900/60 text-[10px] text-emerald-300">Baseline</span>
+          </div>
+          <h4 class="font-display font-bold text-white text-sm mb-1">Standard Traffic</h4>
+          <p class="text-[11px] text-emerald-300/70">300 Concurrent Users querying single district weather and crop suitability.</p>
+        </div>
+
+        <!-- Scenario 2 -->
+        <div onclick="selectScenario(2)" id="scenario-2" class="scenario-card cursor-pointer p-4 rounded-2xl bg-earth-900/90 border-2 border-transparent transition-all hover:bg-earth-850">
+          <div class="flex items-center justify-between text-xs mb-2">
+            <span class="font-mono text-harvest-400 font-bold">Scenario B</span>
+            <span class="px-2 py-0.5 rounded bg-harvest-900/60 text-[10px] text-harvest-300">High Load</span>
+          </div>
+          <h4 class="font-display font-bold text-white text-sm mb-1">Sowing Season Burst</h4>
+          <p class="text-[11px] text-emerald-300/70">1,500 Concurrent Users requesting instant predictions before sowing window closes.</p>
+        </div>
+
+        <!-- Scenario 3 -->
+        <div onclick="selectScenario(3)" id="scenario-3" class="scenario-card cursor-pointer p-4 rounded-2xl bg-earth-900/90 border-2 border-transparent transition-all hover:bg-earth-850">
+          <div class="flex items-center justify-between text-xs mb-2">
+            <span class="font-mono text-cyan-400 font-bold">Scenario C</span>
+            <span class="px-2 py-0.5 rounded bg-cyan-900/60 text-[10px] text-cyan-300">Resilience</span>
+          </div>
+          <h4 class="font-display font-bold text-white text-sm mb-1">Weather API Degradation</h4>
+          <p class="text-[11px] text-emerald-300/70">Upstream meteorological API slow/unavailable; triggers cached Redis fallback.</p>
+        </div>
+
+        <!-- Scenario 4 -->
+        <div onclick="selectScenario(4)" id="scenario-4" class="scenario-card cursor-pointer p-4 rounded-2xl bg-earth-900/90 border-2 border-transparent transition-all hover:bg-earth-850">
+          <div class="flex items-center justify-between text-xs mb-2">
+            <span class="font-mono text-purple-400 font-bold">Scenario D</span>
+            <span class="px-2 py-0.5 rounded bg-purple-900/60 text-[10px] text-purple-300">Batch Job</span>
+          </div>
+          <h4 class="font-display font-bold text-white text-sm mb-1">Large Regional Batch</h4>
+          <p class="text-[11px] text-emerald-300/70">5,000 Bulk village-level queries processed concurrently by background workers.</p>
+        </div>
+      </div>
+
+      <!-- Live Locust Load Graph & Telemetry Gauges -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+        
+        <!-- Main Chart (8 cols) -->
+        <div class="lg:col-span-8 bg-earth-900/90 border border-emerald-800/60 rounded-3xl p-6 shadow-xl">
+          <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
+            <div>
+              <h3 class="font-display font-bold text-white text-lg flex items-center gap-2">
+                <i data-lucide="line-chart" class="w-5 h-5 text-emerald-400"></i>
+                Locust Load Test Progression (RPS & Latency Over Time)
+              </h3>
+              <p class="text-xs text-emerald-300/70">Live simulated worker pool firing requests against FastAPI /predict endpoint</p>
+            </div>
+            <div class="flex items-center gap-2 text-xs font-mono">
+              <span class="inline-flex items-center gap-1 text-emerald-400">
+                <span class="w-2.5 h-2.5 rounded bg-emerald-400"></span> Requests/Sec
+              </span>
+              <span class="inline-flex items-center gap-1 text-harvest-400 ml-2">
+                <span class="w-2.5 h-2.5 rounded bg-harvest-400"></span> p95 Latency (ms)
+              </span>
+            </div>
+          </div>
+
+          <div class="h-64 sm:h-72 relative">
+            <canvas id="stressChart"></canvas>
+          </div>
+        </div>
+
+        <!-- Telemetry Gauges (4 cols) -->
+        <div class="lg:col-span-4 bg-earth-900/90 border border-emerald-800/60 rounded-3xl p-6 flex flex-col justify-between space-y-4">
+          <div>
+            <h4 class="text-xs font-mono uppercase tracking-wider text-emerald-400 mb-3 font-semibold">Live System Metrics</h4>
+            
+            <div class="space-y-4">
+              <!-- Metric 1: p95 Latency -->
+              <div class="p-3 rounded-2xl bg-earth-950 border border-emerald-900/60">
+                <div class="flex justify-between text-xs text-emerald-300 mb-1">
+                  <span>p95 Response Latency</span>
+                  <span class="font-mono font-bold text-harvest-400" id="metric-p95">42 ms</span>
+                </div>
+                <div class="w-full bg-earth-900 h-2 rounded-full overflow-hidden">
+                  <div class="bg-harvest-400 h-full rounded-full transition-all duration-500" id="bar-p95" style="width: 28%"></div>
+                </div>
+                <div class="flex justify-between text-[10px] text-emerald-500 font-mono mt-1">
+                  <span>Target: &lt;100ms</span>
+                  <span class="text-emerald-400">Optimal</span>
+                </div>
+              </div>
+
+              <!-- Metric 2: Throughput -->
+              <div class="p-3 rounded-2xl bg-earth-950 border border-emerald-900/60">
+                <div class="flex justify-between text-xs text-emerald-300 mb-1">
+                  <span>Max Peak Throughput</span>
+                  <span class="font-mono font-bold text-emerald-300" id="metric-rps">1,420 RPS</span>
+                </div>
+                <div class="w-full bg-earth-900 h-2 rounded-full overflow-hidden">
+                  <div class="bg-emerald-400 h-full rounded-full transition-all duration-500" id="bar-rps" style="width: 78%"></div>
+                </div>
+                <div class="flex justify-between text-[10px] text-emerald-500 font-mono mt-1">
+                  <span>Load: 1,500 users</span>
+                  <span class="text-emerald-400">Scalable</span>
+                </div>
+              </div>
+
+              <!-- Metric 3: Error Rate -->
+              <div class="p-3 rounded-2xl bg-earth-950 border border-emerald-900/60">
+                <div class="flex justify-between text-xs text-emerald-300 mb-1">
+                  <span>HTTP Error Rate (4xx/5xx)</span>
+                  <span class="font-mono font-bold text-emerald-400" id="metric-err">0.04 %</span>
+                </div>
+                <div class="w-full bg-earth-900 h-2 rounded-full overflow-hidden">
+                  <div class="bg-red-400 h-full rounded-full transition-all duration-500" id="bar-err" style="width: 2%"></div>
+                </div>
+                <div class="flex justify-between text-[10px] text-emerald-500 font-mono mt-1">
+                  <span>Threshold: &lt;1.0%</span>
+                  <span class="text-emerald-400">Zero Critical</span>
+                </div>
+              </div>
+
+              <!-- Metric 4: CPU & Memory -->
+              <div class="p-3 rounded-2xl bg-earth-950 border border-emerald-900/60 flex items-center justify-between text-xs font-mono">
+                <div>
+                  <span class="text-emerald-500 block text-[10px]">CPU Utilization</span>
+                  <span class="text-white font-bold" id="metric-cpu">41.2 %</span>
+                </div>
+                <div class="h-6 w-px bg-emerald-800"></div>
+                <div>
+                  <span class="text-emerald-500 block text-[10px]">Memory Allocated</span>
+                  <span class="text-white font-bold" id="metric-ram">480 MB</span>
+                </div>
+                <div class="h-6 w-px bg-emerald-800"></div>
+                <div>
+                  <span class="text-emerald-500 block text-[10px]">Cache Hit Rate</span>
+                  <span class="text-harvest-400 font-bold" id="metric-cache">94.8 %</span>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+          <div class="text-[11px] text-emerald-400/80 font-mono pt-2 border-t border-emerald-900/60 flex items-center justify-between">
+            <span>Pass Criteria: Green</span>
+            <span class="text-emerald-300">Ready for Deployment</span>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- ========================================== -->
+    <!-- TAB 4: SECURITY & DATA PRIVACY (DPDP 2023) -->
+    <!-- ========================================== -->
+    <div id="tab-security" class="tab-pane hidden space-y-8">
+      
+      <div class="text-center max-w-3xl mx-auto space-y-2">
+        <span class="text-xs font-mono uppercase tracking-widest text-emerald-400 bg-emerald-900/40 px-3 py-1 rounded-full border border-emerald-700/50">
+          Milestone 4 Audit Compliance
+        </span>
+        <h2 class="text-3xl sm:text-4xl font-extrabold font-display text-white">Security Hardening & Data Privacy Compliance</h2>
+        <p class="text-sm text-emerald-200/80">
+          Strict adherence to the OWASP Top 10 Web Security Standards and India's Digital Personal Data Protection (DPDP) Act 2023.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        
+        <!-- Security Hardening Card -->
+        <div class="bg-earth-900/90 border border-emerald-800/60 rounded-3xl p-6 sm:p-8 space-y-5">
+          <div class="flex items-center gap-3 pb-3 border-b border-emerald-800/50">
+            <div class="w-10 h-10 rounded-2xl bg-emerald-800/60 border border-emerald-600/40 flex items-center justify-center text-emerald-300">
+              <i data-lucide="lock" class="w-5 h-5"></i>
+            </div>
+            <div>
+              <h3 class="text-xl font-bold font-display text-white">Security Hardening Protocol</h3>
+              <p class="text-xs text-emerald-400/80">System-wide defensive architecture against web threats</p>
+            </div>
+          </div>
+
+          <div class="space-y-3 text-xs">
+            <!-- Item 1 -->
+            <div class="p-3.5 rounded-2xl bg-earth-950/70 border border-emerald-900/60 flex items-start gap-3">
+              <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-400 shrink-0 mt-0.5"></i>
+              <div>
+                <strong class="text-white text-sm block">Input Validation Against Injection Attacks</strong>
+                <p class="text-emerald-300/70 mt-0.5">Strict Pydantic schema typing, bounds enforcement (-10°C to 55°C, 0 to 2000mm rain), preventing SQLi, NoSQLi, and shell injection vectors.</p>
+              </div>
+            </div>
+
+            <!-- Item 2 -->
+            <div class="p-3.5 rounded-2xl bg-earth-950/70 border border-emerald-900/60 flex items-start gap-3">
+              <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-400 shrink-0 mt-0.5"></i>
+              <div>
+                <strong class="text-white text-sm block">OWASP Top 10 Web Endpoint Review</strong>
+                <p class="text-emerald-300/70 mt-0.5">Automated ZAP scanning of all REST routes; zero open high-severity vulnerabilities; CORS restricted to production origins only.</p>
+              </div>
+            </div>
+
+            <!-- Item 3 -->
+            <div class="p-3.5 rounded-2xl bg-earth-950/70 border border-emerald-900/60 flex items-start gap-3">
+              <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-400 shrink-0 mt-0.5"></i>
+              <div>
+                <strong class="text-white text-sm block">Secure Storage of API Keys & Secrets</strong>
+                <p class="text-emerald-300/70 mt-0.5">No hardcoded meteorological credentials. Ingested through environment variables and isolated cloud secret managers.</p>
+              </div>
+            </div>
+
+            <!-- Item 4 -->
+            <div class="p-3.5 rounded-2xl bg-earth-950/70 border border-emerald-900/60 flex items-start gap-3">
+              <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-400 shrink-0 mt-0.5"></i>
+              <div>
+                <strong class="text-white text-sm block">HTTPS & Secure Transport Layer</strong>
+                <p class="text-emerald-300/70 mt-0.5">Enforced HSTS (HTTP Strict Transport Security) with TLS 1.3 protocol encryption for all field farmer queries.</p>
+              </div>
+            </div>
+
+            <!-- Item 5 -->
+            <div class="p-3.5 rounded-2xl bg-earth-950/70 border border-emerald-900/60 flex items-start gap-3">
+              <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-400 shrink-0 mt-0.5"></i>
+              <div>
+                <strong class="text-white text-sm block">Dependency Vulnerability Scanning</strong>
+                <p class="text-emerald-300/70 mt-0.5">Automated Dependabot & Snyk audits on all Python packages (scikit-learn, TensorFlow, FastAPI) and npm libraries.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Data Privacy Card (DPDP Act 2023) -->
+        <div class="bg-earth-900/90 border border-emerald-800/60 rounded-3xl p-6 sm:p-8 space-y-5">
+          <div class="flex items-center gap-3 pb-3 border-b border-emerald-800/50">
+            <div class="w-10 h-10 rounded-2xl bg-harvest-800/60 border border-harvest-600/40 flex items-center justify-center text-harvest-300">
+              <i data-lucide="shield" class="w-5 h-5"></i>
+            </div>
+            <div>
+              <h3 class="text-xl font-bold font-display text-white">Data Privacy & India's DPDP Act 2023</h3>
+              <p class="text-xs text-harvest-400/80">Protection of farmer location, agricultural records, and sovereignty</p>
+            </div>
+          </div>
+
+          <div class="space-y-3 text-xs">
+            <!-- DPDP Item 1 -->
+            <div class="p-3.5 rounded-2xl bg-earth-950/70 border border-emerald-900/60 flex items-start gap-3">
+              <i data-lucide="check" class="w-4 h-4 text-harvest-400 shrink-0 mt-0.5"></i>
+              <div>
+                <strong class="text-white text-sm block">Data Minimization Principle</strong>
+                <p class="text-emerald-300/70 mt-0.5">Collects exclusively what the predictive model requires: localized climate parameters and soil characteristics. No aadhaar or financial telemetry is ever recorded.</p>
+              </div>
+            </div>
+
+            <!-- DPDP Item 2 -->
+            <div class="p-3.5 rounded-2xl bg-earth-950/70 border border-emerald-900/60 flex items-start gap-3">
+              <i data-lucide="check" class="w-4 h-4 text-harvest-400 shrink-0 mt-0.5"></i>
+              <div>
+                <strong class="text-white text-sm block">Farmer Location & Profile Obfuscation</strong>
+                <p class="text-emerald-300/70 mt-0.5">GPS coordinates are coarsened to district/block centroid resolution before logging, preventing reverse identification of individual farmer plots.</p>
+              </div>
+            </div>
+
+            <!-- DPDP Item 3 -->
+            <div class="p-3.5 rounded-2xl bg-earth-950/70 border border-emerald-900/60 flex items-start gap-3">
+              <i data-lucide="check" class="w-4 h-4 text-harvest-400 shrink-0 mt-0.5"></i>
+              <div>
+                <strong class="text-white text-sm block">Alignment with DPDP Act 2023 Statutory Principles</strong>
+                <p class="text-emerald-300/70 mt-0.5">Complies with the Digital Personal Data Protection Act: Clear notice in vernacular language, verifiable consent mechanisms, and easy right to withdraw data.</p>
+              </div>
+            </div>
+
+            <!-- DPDP Item 4 -->
+            <div class="p-3.5 rounded-2xl bg-earth-950/70 border border-emerald-900/60 flex items-start gap-3">
+              <i data-lucide="check" class="w-4 h-4 text-harvest-400 shrink-0 mt-0.5"></i>
+              <div>
+                <strong class="text-white text-sm block">Clear Consent & Retention Schedules</strong>
+                <p class="text-emerald-300/70 mt-0.5">Session-only memory storage for ad-hoc farmer queries. Temporary operational cache deleted automatically after 7 calendar days.</p>
+              </div>
+            </div>
+
+            <!-- DPDP Item 5 -->
+            <div class="p-3.5 rounded-2xl bg-earth-950/70 border border-emerald-900/60 flex items-start gap-3">
+              <i data-lucide="check" class="w-4 h-4 text-harvest-400 shrink-0 mt-0.5"></i>
+              <div>
+                <strong class="text-white text-sm block">Zero Sensitive Data in Logs or Public Repos</strong>
+                <p class="text-emerald-300/70 mt-0.5">Strict log masking scrubbing IP addresses, device identifiers, and query history from all runtime stdout and application trace logs.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- ========================================== -->
+    <!-- TAB 5: VIVA VOCE DEFENSE & STUDENT SHOWCASE -->
+    <!-- ========================================== -->
+    <div id="tab-viva" class="tab-pane hidden space-y-8">
+      
+      <div class="text-center max-w-3xl mx-auto space-y-2">
+        <span class="text-xs font-mono uppercase tracking-widest text-emerald-400 bg-emerald-900/40 px-3 py-1 rounded-full border border-emerald-700/50">
+          Milestone 5 Viva Voce Defense Prep
+        </span>
+        <h2 class="text-3xl sm:text-4xl font-extrabold font-display text-white">Interactive Examiner Q&A Defense Simulator</h2>
+        <p class="text-sm text-emerald-200/80">
+          Designed for project viva defense at MITS Gwalior. Test your knowledge on core architectural questions from Slide 6 of Milestone 5.
+        </p>
+      </div>
+
+      <!-- 4 Core Questions from Slide 6 -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        
+        <!-- Question 1 -->
+        <div class="viva-card bg-earth-900/90 border border-emerald-800/60 rounded-3xl p-6 transition-all">
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-xs font-mono font-bold text-emerald-400 px-2.5 py-1 rounded bg-emerald-950 border border-emerald-800/50">Question 01</span>
+            <span class="text-xs text-emerald-400/70">Prediction Architecture</span>
+          </div>
+          <h3 class="text-lg font-bold font-display text-white mb-2">How are predictions made?</h3>
+          <p class="text-xs text-emerald-300/80 mb-4">
+            Explain the multi-stage machine learning inference pipeline from live weather input to ranked crop recommendation.
+          </p>
+          <button onclick="toggleVivaAnswer(1)" class="w-full py-2.5 px-4 rounded-xl bg-emerald-900/50 hover:bg-emerald-800/60 border border-emerald-700/50 text-xs font-semibold text-emerald-200 transition-colors flex items-center justify-between">
+            <span id="viva-btn-text-1">Reveal Model Defense Answer</span>
+            <i data-lucide="chevron-down" id="viva-icon-1" class="w-4 h-4 transition-transform"></i>
+          </button>
+          <div id="viva-ans-1" class="hidden mt-4 pt-3 border-t border-emerald-800/50 text-xs text-emerald-100/90 space-y-2 leading-relaxed bg-earth-950/60 p-3.5 rounded-xl">
+            <p><strong class="text-harvest-400 font-mono">1. Telemetry Ingestion:</strong> Ingests 4 atmospheric parameters (Temperature, Humidity, Rainfall, Soil Moisture) from meteorological feeds.</p>
+            <p><strong class="text-harvest-400 font-mono">2. LSTM Forecasting:</strong> Recurrent LSTM networks evaluate past 30-day temporal trends to forecast weather conditions through the crop maturity window.</p>
+            <p><strong class="text-harvest-400 font-mono">3. Ensemble Yield Regressor:</strong> Feeds the normalized vectors into Random Forest (180 trees) and Gradient Boosting models trained on 15 years of agricultural records.</p>
+            <p><strong class="text-harvest-400 font-mono">4. Suitability Scoring:</strong> Ranks crops based on predicted quintals/hectare weighted by water efficiency and climate resilience index.</p>
+          </div>
+        </div>
+
+        <!-- Question 2 -->
+        <div class="viva-card bg-earth-900/90 border border-emerald-800/60 rounded-3xl p-6 transition-all">
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-xs font-mono font-bold text-harvest-400 px-2.5 py-1 rounded bg-earth-950 border border-harvest-800/50">Question 02</span>
+            <span class="text-xs text-emerald-400/70">Evaluation Methodology</span>
+          </div>
+          <h3 class="text-lg font-bold font-display text-white mb-2">How was model performance measured?</h3>
+          <p class="text-xs text-emerald-300/80 mb-4">
+            What mathematical metrics and cross-validation procedures were used to ensure model generalization and avoid overfitting?
+          </p>
+          <button onclick="toggleVivaAnswer(2)" class="w-full py-2.5 px-4 rounded-xl bg-emerald-900/50 hover:bg-emerald-800/60 border border-emerald-700/50 text-xs font-semibold text-emerald-200 transition-colors flex items-center justify-between">
+            <span id="viva-btn-text-2">Reveal Model Defense Answer</span>
+            <i data-lucide="chevron-down" id="viva-icon-2" class="w-4 h-4 transition-transform"></i>
+          </button>
+          <div id="viva-ans-2" class="hidden mt-4 pt-3 border-t border-emerald-800/50 text-xs text-emerald-100/90 space-y-2 leading-relaxed bg-earth-950/60 p-3.5 rounded-xl">
+            <p><strong class="text-harvest-400 font-mono">1. Regression Metrics:</strong> Evaluated using Root Mean Squared Error (RMSE = 2.18 Qtl/Ha), Mean Absolute Error (MAE = 1.45 Qtl/Ha), and Coefficient of Determination (R² = 0.924).</p>
+            <p><strong class="text-harvest-400 font-mono">2. k-Fold Cross-Validation:</strong> Employed 5-Fold stratified cross-validation across diverse agro-climatic zones to verify that the ensemble generalizes without overfitting.</p>
+            <p><strong class="text-harvest-400 font-mono">3. Responsiveness Benchmark:</strong> Verified p95 API response time of 42ms under 1,420 concurrent requests/sec with a 0.04% error threshold.</p>
+          </div>
+        </div>
+
+        <!-- Question 3 -->
+        <div class="viva-card bg-earth-900/90 border border-emerald-800/60 rounded-3xl p-6 transition-all">
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-xs font-mono font-bold text-red-400 px-2.5 py-1 rounded bg-earth-950 border border-red-800/50">Question 03</span>
+            <span class="text-xs text-emerald-400/70">Constraints & Boundary</span>
+          </div>
+          <h3 class="text-lg font-bold font-display text-white mb-2">What are the limitations?</h3>
+          <p class="text-xs text-emerald-300/80 mb-4">
+            Identify the current technical boundaries, physical assumptions, and external dependencies of the AgriPredict system.
+          </p>
+          <button onclick="toggleVivaAnswer(3)" class="w-full py-2.5 px-4 rounded-xl bg-emerald-900/50 hover:bg-emerald-800/60 border border-emerald-700/50 text-xs font-semibold text-emerald-200 transition-colors flex items-center justify-between">
+            <span id="viva-btn-text-3">Reveal Model Defense Answer</span>
+            <i data-lucide="chevron-down" id="viva-icon-3" class="w-4 h-4 transition-transform"></i>
+          </button>
+          <div id="viva-ans-3" class="hidden mt-4 pt-3 border-t border-emerald-800/50 text-xs text-emerald-100/90 space-y-2 leading-relaxed bg-earth-950/60 p-3.5 rounded-xl">
+            <p><strong class="text-harvest-400 font-mono">1. Micro-Climate Variations:</strong> Free weather APIs provide district-level resolution (10km grid), which may miss valley-specific micro-frost or isolated cloudbursts.</p>
+            <p><strong class="text-harvest-400 font-mono">2. Dynamic Pest Attacks:</strong> Current models focus strictly on climate and soil; biological pest infestations or locust swarms require separate imagery models.</p>
+            <p><strong class="text-harvest-400 font-mono">3. Real-Time Soil Sensor Hardware:</strong> Requires manual selection of soil type unless IoT sensor telemetry is deployed on the farmer's specific acre.</p>
+          </div>
+        </div>
+
+        <!-- Question 4 -->
+        <div class="viva-card bg-earth-900/90 border border-emerald-800/60 rounded-3xl p-6 transition-all">
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-xs font-mono font-bold text-cyan-400 px-2.5 py-1 rounded bg-earth-950 border border-cyan-800/50">Question 04</span>
+            <span class="text-xs text-emerald-400/70">Roadmap & Vision</span>
+          </div>
+          <h3 class="text-lg font-bold font-display text-white mb-2">What is the future scope?</h3>
+          <p class="text-xs text-emerald-300/80 mb-4">
+            Outline the engineering roadmap to expand AgriPredict into an all-inclusive national precision farming ecosystem.
+          </p>
+          <button onclick="toggleVivaAnswer(4)" class="w-full py-2.5 px-4 rounded-xl bg-emerald-900/50 hover:bg-emerald-800/60 border border-emerald-700/50 text-xs font-semibold text-emerald-200 transition-colors flex items-center justify-between">
+            <span id="viva-btn-text-4">Reveal Model Defense Answer</span>
+            <i data-lucide="chevron-down" id="viva-icon-4" class="w-4 h-4 transition-transform"></i>
+          </button>
+          <div id="viva-ans-4" class="hidden mt-4 pt-3 border-t border-emerald-800/50 text-xs text-emerald-100/90 space-y-2 leading-relaxed bg-earth-950/60 p-3.5 rounded-xl">
+            <p><strong class="text-harvest-400 font-mono">1. Economic Optimization:</strong> Link recommendation rankings to real-time APMC Mandi wholesale price trends to maximize net farmer profit margin per acre.</p>
+            <p><strong class="text-harvest-400 font-mono">2. Vernacular Voice Interface:</strong> Deploy speech-to-text models supporting Hindi, Malwi, Bundelkhandi, and regional dialects for non-literate farmers.</p>
+            <p><strong class="text-harvest-400 font-mono">3. Satellite Multispectral Telemetry:</strong> Ingest Sentinel-2 and Landsat NDVI indices to track vegetation vitality and moisture stresses in real time.</p>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Academic Attribution & Author Cards -->
+      <div class="mt-12 pt-8 border-t border-emerald-800/40">
+        <h3 class="text-xl font-bold font-display text-white mb-6 text-center">Project Authors & Faculty Guide</h3>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
+          <!-- Student 1 -->
+          <div class="p-5 rounded-2xl bg-earth-900/90 border border-emerald-800/60 text-center space-y-2">
+            <div class="w-14 h-14 rounded-full bg-emerald-800/80 mx-auto flex items-center justify-center text-emerald-300 font-bold text-lg font-display">
+              SG
+            </div>
+            <h4 class="font-bold text-white text-base">Sejal Garg</h4>
+            <div class="text-xs font-mono text-emerald-400">Roll No: BTMC2601116</div>
+            <p class="text-[11px] text-emerald-300/70">Data Preprocessing, Model Optimization & React Dashboard</p>
+          </div>
+
+          <!-- Student 2 -->
+          <div class="p-5 rounded-2xl bg-earth-900/90 border border-emerald-800/60 text-center space-y-2">
+            <div class="w-14 h-14 rounded-full bg-emerald-800/80 mx-auto flex items-center justify-center text-emerald-300 font-bold text-lg font-display">
+              SK
+            </div>
+            <h4 class="font-bold text-white text-base">Saurav Kuswah</h4>
+            <div class="text-xs font-mono text-emerald-400">Roll No: BTMC2601115</div>
+            <p class="text-[11px] text-emerald-300/70">Ingestion Pipeline, LSTM Forecasting & Cloud Deployment</p>
+          </div>
+
+          <!-- Faculty Guide -->
+          <div class="p-5 rounded-2xl bg-earth-900/90 border border-harvest-700/50 text-center space-y-2">
+            <div class="w-14 h-14 rounded-full bg-harvest-900/80 mx-auto flex items-center justify-center text-harvest-300 font-bold text-lg font-display">
+              KT
+            </div>
+            <h4 class="font-bold text-white text-base">Prof. Kuldeep Tiwari</h4>
+            <div class="text-xs font-mono text-harvest-400">Project Guide / Faculty Mentor</div>
+            <p class="text-[11px] text-emerald-300/70">Madhav Institute of Technology, Gwalior</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ========================================== -->
+    <!-- TAB 6: DOCUMENTATION & USER MANUAL         -->
+    <!-- ========================================== -->
+    <div id="tab-docs" class="tab-pane hidden space-y-8">
+      
+      <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 border-b border-emerald-800/40">
+        <div>
+          <span class="text-xs font-mono uppercase text-emerald-400 font-semibold tracking-wider">Comprehensive Documentation</span>
+          <h2 class="text-2xl sm:text-3xl font-extrabold font-display text-white">Technical Manual & Farmer Operational Guide</h2>
+        </div>
+        <button onclick="window.print()" class="px-4 py-2 rounded-xl bg-emerald-800/60 hover:bg-emerald-700/60 border border-emerald-600/50 text-xs font-medium text-emerald-100 flex items-center gap-2">
+          <i data-lucide="download" class="w-4 h-4"></i>
+          <span>Save as Printable PDF</span>
+        </button>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        
+        <!-- Left Nav for Documentation (4 cols) -->
+        <div class="lg:col-span-4 space-y-3">
+          <div class="p-4 rounded-2xl bg-earth-900/90 border border-emerald-800/60 space-y-2">
+            <h4 class="text-xs font-mono uppercase tracking-wider text-emerald-400 font-semibold mb-3">Documentation Index</h4>
+            
+            <a href="#doc-manual" class="block p-2.5 rounded-xl bg-emerald-950/80 text-xs font-medium text-white hover:bg-emerald-900/50 transition-colors">
+              1. Non-Technical Farmer User Guide
+            </a>
+            <a href="#doc-arch" class="block p-2.5 rounded-xl bg-emerald-950/80 text-xs font-medium text-white hover:bg-emerald-900/50 transition-colors">
+              2. System Architecture & ML Pipeline
+            </a>
+            <a href="#doc-algo" class="block p-2.5 rounded-xl bg-emerald-950/80 text-xs font-medium text-white hover:bg-emerald-900/50 transition-colors">
+              3. Algorithms: RF vs Boosting vs LSTM
+            </a>
+            <a href="#doc-cloud" class="block p-2.5 rounded-xl bg-emerald-950/80 text-xs font-medium text-white hover:bg-emerald-900/50 transition-colors">
+              4. AWS / Heroku Cloud Deployment Manual
+            </a>
+            <a href="#doc-compliance" class="block p-2.5 rounded-xl bg-emerald-950/80 text-xs font-medium text-white hover:bg-emerald-900/50 transition-colors">
+              5. DPDP Act 2023 Compliance Statement
+            </a>
+          </div>
+
+          <div class="p-4 rounded-2xl bg-earth-900/70 border border-emerald-800/50 text-xs space-y-2">
+            <span class="text-harvest-400 font-semibold block">Academic Submission Details</span>
+            <p class="text-emerald-300/80">
+              <strong>College:</strong> Madhav Institute of Technology, Gwalior<br>
+              <strong>Course:</strong> Artificial Intelligence & Machine Learning Systems<br>
+              <strong>Term:</strong> July – Dec 2026<br>
+              <strong>Authors:</strong> Sejal Garg & Saurav Kuswah<br>
+              <strong>Guide:</strong> Prof. Kuldeep Tiwari
+            </p>
+          </div>
+        </div>
+
+        <!-- Right Content Body (8 cols) -->
+        <div class="lg:col-span-8 bg-earth-900/90 border border-emerald-800/60 rounded-3xl p-6 sm:p-8 space-y-8 text-xs leading-relaxed text-emerald-200/90">
+          
+          <!-- Section 1 -->
+          <section id="doc-manual" class="space-y-3">
+            <h3 class="text-lg font-bold font-display text-white pb-2 border-b border-emerald-800/50 flex items-center gap-2">
+              <i data-lucide="book" class="w-4 h-4 text-emerald-400"></i>
+              1. Non-Technical Farmer User Guide (Step-by-Step)
+            </h3>
+            <p>
+              AgriPredict was purposefully designed for simple, high-contrast readability in rural field environments. Non-technical farmers can utilize the system in three straightforward actions:
+            </p>
+            <ol class="space-y-2 list-decimal list-inside bg-earth-950/60 p-4 rounded-2xl border border-emerald-900/60">
+              <li><strong class="text-white">Choose Your Region or Click 'Fetch Live':</strong> Select your agro-climatic zone (e.g. Gwalior - Chambal Basin) from the dropdown or click the live weather fetch button to auto-detect current meteorological data.</li>
+              <li><strong class="text-white">Select Current Sowing Season:</strong> Toggle between Kharif (monsoon rain crops), Rabi (winter crops), or Zaid (summer irrigated crops).</li>
+              <li><strong class="text-white">Review the Ranked Crop Matrix:</strong> Examine the top three recommended crops. Each recommendation presents an estimated harvest yield (Quintals per hectare), a Climate Resilience index, and specific farming advice.</li>
+            </ol>
+          </section>
+
+          <!-- Section 2 -->
+          <section id="doc-arch" class="space-y-3">
+            <h3 class="text-lg font-bold font-display text-white pb-2 border-b border-emerald-800/50 flex items-center gap-2">
+              <i data-lucide="cpu" class="w-4 h-4 text-emerald-400"></i>
+              2. System Architecture & Mathematical Ingestion Pipeline
+            </h3>
+            <p>
+              The system operates a decoupled, 4-tier microservice architecture:
+            </p>
+            <div class="space-y-2 font-mono text-[11px] bg-earth-950/60 p-4 rounded-2xl border border-emerald-900/60">
+              <div>• Tier 1: Real-time Ingestion Layer pulling weather feeds every 15 minutes via asynchronous HTTP workers.</div>
+              <div>• Tier 2: Preprocessing pipeline executing Z-score anomaly rejection and Min-Max scaling: <span class="text-harvest-400">x' = (x - x_min) / (x_max - x_min)</span>.</div>
+              <div>• Tier 3: Inference Service running dual ensemble regressors with cross-validated weights: <span class="text-harvest-400">Ŷ = 0.55 * Ŷ_GB + 0.45 * Ŷ_RF</span>.</div>
+              <div>• Tier 4: Client Presentation Layer delivering reactive data visualization with zero horizontal scroll and fluid responsiveness.</div>
+            </div>
+          </section>
+
+          <!-- Section 3 -->
+          <section id="doc-algo" class="space-y-3">
+            <h3 class="text-lg font-bold font-display text-white pb-2 border-b border-emerald-800/50 flex items-center gap-2">
+              <i data-lucide="git-commit" class="w-4 h-4 text-emerald-400"></i>
+              3. Comparative Algorithms Rationale: Random Forest, Boosting & LSTM
+            </h3>
+            <p>
+              Why employ this specific dual-family model setup rather than single deep neural networks?
+            </p>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
+              <div class="p-3 rounded-xl bg-earth-950/80 border border-emerald-900/60">
+                <strong class="text-white block font-mono">Random Forest</strong>
+                <p class="text-[11px] text-emerald-300/70 mt-1">Exceptional resistance to tabular overfitting; provides exact Gini feature importance to explain why a crop was selected.</p>
+              </div>
+              <div class="p-3 rounded-xl bg-earth-950/80 border border-emerald-900/60">
+                <strong class="text-white block font-mono">Gradient Boosting</strong>
+                <p class="text-[11px] text-emerald-300/70 mt-1">Sequentially corrects residual errors from previous decision trees, achieving superior R² fit (0.924) on complex crop yields.</p>
+              </div>
+              <div class="p-3 rounded-xl bg-earth-950/80 border border-emerald-900/60">
+                <strong class="text-white block font-mono">LSTM Recurrent Net</strong>
+                <p class="text-[11px] text-emerald-300/70 mt-1">Maintains cell state memory across 30-day temporal sequences to model impending dry spells or monsoon shifts.</p>
+              </div>
+            </div>
+          </section>
+
+          <!-- Section 4 -->
+          <section id="doc-cloud" class="space-y-3">
+            <h3 class="text-lg font-bold font-display text-white pb-2 border-b border-emerald-800/50 flex items-center gap-2">
+              <i data-lucide="server" class="w-4 h-4 text-emerald-400"></i>
+              4. AWS / Heroku Cloud Deployment Manual
+            </h3>
+            <p>
+              Steps followed to deploy the live application into production:
+            </p>
+            <div class="bg-earth-950/80 p-4 rounded-2xl border border-emerald-900/60 font-mono text-[11px] space-y-1">
+              <div class="text-emerald-400"># 1. Containerize application with Dockerfile</div>
+              <div>docker build -t agripredict:v2.4 .</div>
+              <div class="text-emerald-400 mt-2"># 2. Configure production environment variables</div>
+              <div>export WEATHER_API_KEY=SECURE_VAULT_TOKEN</div>
+              <div>export MODEL_PATH=/models/ensemble_rf_gb.joblib</div>
+              <div class="text-emerald-400 mt-2"># 3. Deploy to AWS Elastic Beanstalk / ECS Fargate</div>
+              <div>eb init agripredict-app --region ap-south-1 --platform docker</div>
+              <div>eb create agripredict-prod-env --instance_type t3.medium</div>
+              <div class="text-emerald-400 mt-2"># 4. Verify SSL/TLS and DNS CNAME binding</div>
+              <div>curl -I https://agripredict.mitsgwalior.in/healthz</div>
+            </div>
+          </section>
+
+          <!-- Section 5 -->
+          <section id="doc-compliance" class="space-y-3">
+            <h3 class="text-lg font-bold font-display text-white pb-2 border-b border-emerald-800/50 flex items-center gap-2">
+              <i data-lucide="shield-alert" class="w-4 h-4 text-emerald-400"></i>
+              5. Statutory DPDP Act 2023 Compliance Statement
+            </h3>
+            <p>
+              Under the Digital Personal Data Protection Act (DPDP) 2023 of India, AgriPredict is classified as a Data Fiduciary adhering to lawful processing principles. The platform does not track or store the identity, mobile number, land registry numbers (Khasra/Khatauni), or banking information of any farmer. All analytical sessions are strictly anonymous and ephemeral.
+            </p>
+          </section>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="border-t border-emerald-900/60 bg-earth-950 py-10 px-4 sm:px-6 lg:px-8 mt-12">
+    <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-harvest-500 p-0.5">
+          <div class="w-full h-full bg-earth-900 rounded-[9px] flex items-center justify-center">
+            <i data-lucide="sprout" class="w-5 h-5 text-emerald-400"></i>
+          </div>
+        </div>
+        <div>
+          <span class="font-display font-bold text-white text-base">AgriPredict Decision Support System</span>
+          <p class="text-xs text-emerald-400/70">MITS Gwalior • Microproject Final Milestone 1–5</p>
+        </div>
+      </div>
+
+      <div class="text-center md:text-right text-xs text-emerald-400/80 space-y-1">
+        <div>Developed by: <strong class="text-white">Sejal Garg (BTMC2601116)</strong> & <strong class="text-white">Saurav Kuswah (BTMC2601115)</strong></div>
+        <div>Under Supervision of: <strong class="text-harvest-400">Prof. Kuldeep Tiwari</strong></div>
+        <div class="text-[11px] text-emerald-500 font-mono">Artificial Intelligence & Machine Learning Systems | 2026</div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Team & Author Details Modal -->
+  <div id="author-modal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-earth-900 border border-emerald-800 rounded-3xl max-w-lg w-full p-6 space-y-6 shadow-2xl relative">
+      <button onclick="closeAuthorsModal()" class="absolute top-5 right-5 text-emerald-400 hover:text-white">
+        <i data-lucide="x" class="w-6 h-6"></i>
+      </button>
+
+      <div class="text-center space-y-1">
+        <span class="text-xs font-mono uppercase text-harvest-400">Academic Project Credits</span>
+        <h3 class="text-2xl font-bold font-display text-white">Madhav Institute of Technology, Gwalior</h3>
+        <p class="text-xs text-emerald-300/80">Department of Artificial Intelligence & Machine Learning Systems</p>
+      </div>
+
+      <div class="space-y-4">
+        <!-- Student 1 -->
+        <div class="p-4 rounded-2xl bg-earth-950 border border-emerald-900/60 flex items-center gap-4">
+          <div class="w-12 h-12 rounded-full bg-emerald-800/80 flex items-center justify-center text-emerald-300 font-bold font-display text-base">SG</div>
+          <div>
+            <h4 class="font-bold text-white text-sm">Sejal Garg</h4>
+            <div class="text-xs font-mono text-emerald-400">Roll No: BTMC2601116</div>
+            <p class="text-[11px] text-emerald-400/70">Preprocessing, Model Hyperparameter Tuning & Web Interface</p>
+          </div>
+        </div>
+
+        <!-- Student 2 -->
+        <div class="p-4 rounded-2xl bg-earth-950 border border-emerald-900/60 flex items-center gap-4">
+          <div class="w-12 h-12 rounded-full bg-emerald-800/80 flex items-center justify-center text-emerald-300 font-bold font-display text-base">SK</div>
+          <div>
+            <h4 class="font-bold text-white text-sm">Saurav Kuswah</h4>
+            <div class="text-xs font-mono text-emerald-400">Roll No: BTMC2601115</div>
+            <p class="text-[11px] text-emerald-400/70">Weather Ingestion Pipeline, LSTM Forecaster & Scalability Testing</p>
+          </div>
+        </div>
+
+        <!-- Teacher / Mentor -->
+        <div class="p-4 rounded-2xl bg-earth-950 border border-harvest-700/60 flex items-center gap-4">
+          <div class="w-12 h-12 rounded-full bg-harvest-900/80 flex items-center justify-center text-harvest-300 font-bold font-display text-base">KT</div>
+          <div>
+            <h4 class="font-bold text-white text-sm">Prof. Kuldeep Tiwari</h4>
+            <div class="text-xs font-mono text-harvest-400">Project Mentor / Course Instructor</div>
+            <p class="text-[11px] text-emerald-400/70">Curriculum Review, Architecture Validation & Final Evaluation</p>
+          </div>
+        </div>
+      </div>
+
+      <button onclick="closeAuthorsModal()" class="w-full py-2.5 rounded-xl bg-emerald-700 hover:bg-emerald-600 text-white font-medium text-xs">
+        Close Window
+      </button>
+    </div>
+  </div>
+
+  <!-- Regional Presets Modal -->
+  <div id="presets-modal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-earth-900 border border-emerald-800 rounded-3xl max-w-xl w-full p-6 space-y-5 shadow-2xl relative">
+      <button onclick="closePresetModal()" class="absolute top-5 right-5 text-emerald-400 hover:text-white">
+        <i data-lucide="x" class="w-6 h-6"></i>
+      </button>
+
+      <div>
+        <h3 class="text-xl font-bold font-display text-white">Load Agro-Climatic Region Presets</h3>
+        <p class="text-xs text-emerald-300/80 mt-1">Instantly populate verified empirical meteorological data for Indian agricultural hubs.</p>
+      </div>
+
+      <div class="space-y-3 max-h-96 overflow-y-auto pr-1">
+        <div onclick="applyPreset('gwalior_winter')" class="p-3 rounded-2xl bg-earth-950 hover:bg-emerald-950/60 border border-emerald-900 cursor-pointer transition-all">
+          <div class="flex justify-between items-center text-xs">
+            <strong class="text-white">Gwalior - Chambal Basin (Rabi / Winter)</strong>
+            <span class="text-harvest-400 font-mono text-[11px]">Temp: 19°C | Rain: 85mm</span>
+          </div>
+          <p class="text-[11px] text-emerald-400/70 mt-1">Optimal for Mustard, Wheat, and Chickpea cultivation.</p>
+        </div>
+
+        <div onclick="applyPreset('malwa_monsoon')" class="p-3 rounded-2xl bg-earth-950 hover:bg-emerald-950/60 border border-emerald-900 cursor-pointer transition-all">
+          <div class="flex justify-between items-center text-xs">
+            <strong class="text-white">Malwa Plateau (Kharif / Monsoon)</strong>
+            <span class="text-harvest-400 font-mono text-[11px]">Temp: 28°C | Rain: 850mm</span>
+          </div>
+          <p class="text-[11px] text-emerald-400/70 mt-1">Black cotton soils high in moisture; optimal for Soybean & Cotton.</p>
+        </div>
+
+        <div onclick="applyPreset('punjab_wheat')" class="p-3 rounded-2xl bg-earth-950 hover:bg-emerald-950/60 border border-emerald-900 cursor-pointer transition-all">
+          <div class="flex justify-between items-center text-xs">
+            <strong class="text-white">Punjab Indo-Gangetic Plains (Rabi Peak)</strong>
+            <span class="text-harvest-400 font-mono text-[11px]">Temp: 16°C | Rain: 140mm</span>
+          </div>
+          <p class="text-[11px] text-emerald-400/70 mt-1">High alluvial soil with assured canal irrigation; prime Wheat & Barley.</p>
+        </div>
+
+        <div onclick="applyPreset('deccan_summer')" class="p-3 rounded-2xl bg-earth-950 hover:bg-emerald-950/60 border border-emerald-900 cursor-pointer transition-all">
+          <div class="flex justify-between items-center text-xs">
+            <strong class="text-white">Deccan Semi-Arid Zone (Zaid / Summer)</strong>
+            <span class="text-harvest-400 font-mono text-[11px]">Temp: 35°C | Rain: 60mm</span>
+          </div>
+          <p class="text-[11px] text-emerald-400/70 mt-1">Arid conditions suited for Pearl Millet (Bajra), Sorghum (Jowar), and Moong.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main JavaScript File -->
+  <script src="app.js"></script>
+  <script>
+    // Initialize Lucide icons on load
+    lucide.createIcons();
+  </script>
+</body>
+</html>

@@ -1,0 +1,183 @@
+/* AgriPredict Custom Design System */
+/* Zero Horizontal Scroll Guarantee & Clean Layout Architecture */
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden !important;
+  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  background-color: #080f0a;
+  color: #ecfdf5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Fluid responsive typography to prevent text overlapping */
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Outfit', sans-serif;
+  line-height: 1.25;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+p, span, label, div {
+  line-height: 1.5;
+  word-break: normal;
+  overflow-wrap: break-word;
+}
+
+/* Clean Custom Scrollbars */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0c150e;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #1e3a24;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #285433;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Subtle Animated Ambient Glows */
+@keyframes pulseSlow {
+  0%, 100% { opacity: 0.2; transform: scale(1); }
+  50% { opacity: 0.35; transform: scale(1.05); }
+}
+
+.ambient-glow {
+  animation: pulseSlow 8s ease-in-out infinite;
+}
+
+/* Tab Navigation Buttons */
+.tab-btn {
+  position: relative;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.tab-btn.active {
+  background: linear-gradient(135deg, #15803d 0%, #166534 100%) !important;
+  color: #ffffff !important;
+  box-shadow: 0 4px 14px -1px rgba(22, 101, 52, 0.5);
+  border-color: rgba(74, 222, 128, 0.4);
+}
+
+/* Sliders Styling */
+input[type=range] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  background: #060e08;
+  border-radius: 6px;
+  outline: none;
+}
+
+input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #22c55e;
+  border: 2px solid #ffffff;
+  cursor: pointer;
+  box-shadow: 0 0 10px rgba(34, 197, 94, 0.5);
+  transition: transform 0.15s ease;
+}
+
+input[type=range]::-webkit-slider-thumb:hover {
+  transform: scale(1.15);
+}
+
+input[type=range]::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #22c55e;
+  border: 2px solid #ffffff;
+  cursor: pointer;
+}
+
+/* Crop Recommendation Card Micro-Interactions */
+.crop-card {
+  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.crop-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(34, 197, 94, 0.4);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+}
+
+/* Scenario Stress Cards */
+.scenario-card {
+  transition: all 0.2s ease;
+}
+
+.scenario-card.active {
+  border-color: #22c55e !important;
+  background-color: #112616 !important;
+  box-shadow: 0 0 18px rgba(34, 197, 94, 0.25);
+}
+
+/* Viva Defense Interactive Cards */
+.viva-card {
+  transition: all 0.25s ease;
+}
+
+.viva-card:hover {
+  border-color: rgba(52, 211, 153, 0.35);
+}
+
+/* Milestone Pills */
+.ms-pill.active {
+  background-color: #15803d !important;
+  color: #ffffff !important;
+  border-color: transparent !important;
+}
+
+/* Print Optimization for Technical Report */
+@media print {
+  body {
+    background-color: #ffffff !important;
+    color: #000000 !important;
+  }
+  
+  header, .academic-bar, #prediction-form, #mobile-menu-btn, button {
+    display: none !important;
+  }
+
+  .tab-pane {
+    display: block !important;
+  }
+
+  .bg-earth-900, .bg-earth-950, .bg-emerald-950 {
+    background: #ffffff !important;
+    color: #000000 !important;
+    border: 1px solid #cccccc !important;
+  }
+
+  .text-white, .text-emerald-200, .text-emerald-300, .text-emerald-400 {
+    color: #111111 !important;
+  }
+}
